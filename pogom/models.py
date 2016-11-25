@@ -1067,7 +1067,7 @@ def parse_gyms(args, gym_responses, wh_update_queue):
     if len(trainers):
         bulk_upsert(Trainer, trainers)
 
-    # This needs to be completed in a transaction, because we don't wany any other thread or process
+    # This needs to be completed in a transaction, because we don't want any other thread or process
     # to mess with the GymMembers for the gyms we're updating while we're updating the bridge table.
     with flaskDb.database.transaction():
         # Get rid of all the gym members, we're going to insert new records.
