@@ -600,8 +600,6 @@ def search_worker_thread(args, account_queue, account_failures, search_items_que
                 log.info(status['message'])
 
                 # Make the actual request. (finally!)
-                # TODO sleep before request
-                # time.sleep(30)
                 response_dict = map_request(api, step_location, args.jitter)
 
                 # G'damnit, nothing back. Mark it up, sleep, carry on.
