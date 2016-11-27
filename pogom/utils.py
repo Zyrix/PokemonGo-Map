@@ -156,6 +156,8 @@ def get_args():
     parser.add_argument('-nk', '--no-pokestops',
                         help='Disables PokeStops from the map (including parsing them into local db).',
                         action='store_true', default=False)
+    parser.add_argument('-ro', '--run-once', help='Scan only once and not in a loop.',
+                        action='store_true', default=False)
     parser.add_argument('-ss', '--spawnpoint-scanning',
                         help='Use spawnpoint scanning (instead of hex grid). Scans in a circle based on step_limit when on DB.', nargs='?', const='nofile', default=False)
     parser.add_argument('--dump-spawnpoints', help='Dump the spawnpoints from the db to json (only for use with -ss).',
@@ -182,7 +184,7 @@ def get_args():
                         nargs='*', default=False, dest='webhooks')
     parser.add_argument('-gi', '--gym-info', help='Get all details about gyms (causes an additional API hit for every gym).',
                         action='store_true', default=False)
-    parser.add_argument('-fi', '--fort-info', help='Get all details about forts (causes an additional API hit for every fort).',
+    parser.add_argument('-pi', '--pokestop-info', help='Get all details about pokestops (causes an additional API hit for every pokestop).',
                         action='store_true', default=False)
     parser.add_argument('--disable-clean', help='Disable clean db loop.',
                         action='store_true', default=False)

@@ -705,6 +705,15 @@ class GymDetails(BaseModel):
     last_scanned = DateTimeField(default=datetime.utcnow)
 
 
+class PokestopDetails(BaseModel):
+    pokestop_id = CharField(primary_key=True, max_length=50)
+    name = CharField()
+    description = TextField(null=True, default="")
+    url = CharField()
+    lure_deployer = CharField(null=True)
+    last_scanned = DateTimeField(default=datetime.utcnow)
+
+
 def hex_bounds(center, steps):
     # Make a box that is (70m * step_limit * 2) + 70m away from the center point.
     # Rationale is that you need to travel.
@@ -760,8 +769,6 @@ def parse_map(args, map_dict, step_location, db_update_queue, wh_update_queue, a
     wild_pokemon = None
     pokesfound = False
     fortsfound = False
-
-    print map_dict
 
     cells = map_dict['responses']['GET_MAP_OBJECTS']['map_cells']
     for cell in cells:
@@ -963,6 +970,7 @@ def parse_map(args, map_dict, step_location, db_update_queue, wh_update_queue, a
     return {
         'count': skipped + stopsskipped + len(pokemons) + len(pokestops) + len(gyms),
         'gyms': gyms,
+        'pokestops': pokestops
     }
 
 
@@ -1085,6 +1093,48 @@ def parse_gyms(args, gym_responses, wh_update_queue):
              len(gym_members))
 
 
+def parse_pokestops(args, pokestop_responses, wh_update_queue):
+    pokestop_details = {}
+
+    for p in pokestop_responses.values():
+        pokestop_id = p['fort_id']
+
+        print p.get('modifiers')[0].get('deployer_player_codename') if p.get('modifiers') is not None else None
+
+        pokestop_details[pokestop_id] = {
+            'pokestop_id': pokestop_id,
+            'name': p['name'],
+            'description': p.get('description'),
+            'url': p['image_urls'][0],
+            'lure_deployer': p.get('modifiers')[0].get('deployer_player_codename') if p.get('modifiers') is not None else None,
+        }
+
+        if args.webhooks:
+            webhook_data = {
+                'id': pokestop_id,
+                'latitude': p['latitude'],
+                'longitude': p['longitude'],
+                'name': p['name'],
+                'description': g.get('description'),
+                'url': p['image_urls'][0],
+                'lure_deployer': p.get('modifiers')[0].get('deployer_player_codename') if p.get('modifiers') is not None else None,
+            }
+            wh_update_queue.put(('pokestop_details', webhook_data))
+
+    # All this database stuff is synchronous (not using the upsert queue) on purpose.
+    # Since the search workers load the PokestopDetails model from the database to determine if a pokestop
+    # needs rescanned, we need to be sure the PokestopDetails get fully committed to the database before moving on.
+    #
+    # We _could_ synchronously upsert PokestopDetails, then queue the other tables for
+    # upsert, but that would put that Pokestop's overall information in a weird non-atomic state.
+
+    # Upsert all the models.
+    if len(pokestop_details):
+        bulk_upsert(PokestopDetails, pokestop_details)
+
+    log.info('Upserted %d pokestops', len(pokestop_details))
+
+
 def db_updater(args, q):
     # The forever loop.
     while True:
@@ -1180,13 +1230,13 @@ def bulk_upsert(cls, data):
 def create_tables(db):
     db.connect()
     verify_database_schema(db)
-    db.create_tables([Pokemon, Pokestop, Gym, ScannedLocation, GymDetails, GymMember, GymPokemon, Trainer, MainWorker, WorkerStatus], safe=True)
+    db.create_tables([Pokemon, Pokestop, PokestopDetails, Gym, ScannedLocation, GymDetails, GymMember, GymPokemon, Trainer, MainWorker, WorkerStatus], safe=True)
     db.close()
 
 
 def drop_tables(db):
     db.connect()
-    db.drop_tables([Pokemon, Pokestop, Gym, ScannedLocation, Versions, GymDetails, GymMember, GymPokemon, Trainer, MainWorker, WorkerStatus, Versions], safe=True)
+    db.drop_tables([Pokemon, Pokestop, PokestopDetails, Gym, ScannedLocation, Versions, GymDetails, GymMember, GymPokemon, Trainer, MainWorker, WorkerStatus, Versions], safe=True)
     db.close()
 
 

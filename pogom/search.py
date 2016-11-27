@@ -35,7 +35,7 @@ from pgoapi.utilities import f2i
 from pgoapi import utilities as util
 from pgoapi.exceptions import AuthException
 
-from .models import parse_map, GymDetails, parse_gyms, MainWorker, WorkerStatus
+from .models import parse_map, GymDetails, PokestopDetails, parse_gyms, parse_pokestops, MainWorker, WorkerStatus
 from .fakePogoApi import FakePogoApi
 from .utils import now
 from .transform import get_new_coords
@@ -267,6 +267,7 @@ def search_overseer_thread(args, new_location_queue, pause_bit, heartb, db_updat
     scheduler_array = []
     account_queue = Queue()
     threadStatus = {}
+    has_started = False
 
     '''
     Create a queue of accounts for workers to pull from. When a worker has failed too many times,
@@ -396,9 +397,13 @@ def search_overseer_thread(args, new_location_queue, pause_bit, heartb, db_updat
                 scheduler_array[i].location_changed(locations[i])
 
         # If there are no search_items_queue either the loop has finished (or been
-        # cleared above) -- either way, time to fill it back up
+        # cleared above) -- either way, time to fill it back up unless parameter 'run once' has been specified.
+        search_items_queue_size = 0
         for i in range(0, len(search_items_queue_array)):
+            search_items_queue_size += search_items_queue_array[i].qsize()
             if search_items_queue_array[i].empty():
+                if args.run_once and has_started:
+                    continue
                 log.debug('Search queue empty, scheduling more items to scan')
                 scheduler_array[i].schedule()
             else:
@@ -411,6 +416,14 @@ def search_overseer_thread(args, new_location_queue, pause_bit, heartb, db_updat
                         threadStatus['Overseer']['message'] += ' ({}s ahead)'.format(nextitem[2] - now())
                     else:
                         threadStatus['Overseer']['message'] += ' ({}s behind)'.format(now() - nextitem[2])
+
+        if search_items_queue_size > 0:
+            has_started = True
+
+        # quit if all queues are empty and parameter 'run once' has been specified
+        if search_items_queue_size == 0 and args.run_once and has_started:
+            log.info('Queue is empty and run once was specified - let\'s quit')
+            break
 
         # Now we just give a little pause here.
         time.sleep(1)
@@ -587,6 +600,8 @@ def search_worker_thread(args, account_queue, account_failures, search_items_que
                 log.info(status['message'])
 
                 # Make the actual request. (finally!)
+                # TODO sleep before request
+                # time.sleep(30)
                 response_dict = map_request(api, step_location, args.jitter)
 
                 # G'damnit, nothing back. Mark it up, sleep, carry on.
@@ -695,57 +710,56 @@ def search_worker_thread(args, account_queue, account_failures, search_items_que
                         if gym_responses:
                             parse_gyms(args, gym_responses, whq)
 
-                # Get detailed information about forts.
-                if args.fort_info and parsed:
-                    print parsed
-                    # Build up a list of forts to check.
-                    forts_to_update = {}
-                    for gym in parsed['gyms'].values():
-                        # Can only get gym details within 1km of our position.
-                        distance = calc_distance(step_location, [gym['latitude'], gym['longitude']])
+                # Get detailed information about pokestops.
+                if args.pokestop_info and parsed:
+                    # Build up a list of pokestops to check.
+                    pokestops_to_update = {}
+                    for pokestop in parsed['pokestops'].values():
+                        # Can only get pokestop details within 1km of our position.
+                        distance = calc_distance(step_location, [pokestop['latitude'], pokestop['longitude']])
                         if distance < 1:
-                            # Check if we already have details on this gym. (if not, get them)
+                            # Check if we already have details on this pokestop. (if not, get them)
                             try:
-                                record = GymDetails.get(gym_id=gym['gym_id'])
-                            except GymDetails.DoesNotExist as e:
-                                gyms_to_update[gym['gym_id']] = gym
+                                record = PokestopDetails.get(pokestop_id=pokestop['pokestop_id'])
+                            except PokestopDetails.DoesNotExist as e:
+                                pokestops_to_update[pokestop['pokestop_id']] = pokestop
                                 continue
 
-                            # If we have a record of this gym already, check if the gym has been updated since our last update.
-                            if record.last_scanned < gym['last_modified']:
-                                gyms_to_update[gym['gym_id']] = gym
+                            # If we have a record of this pokestop already, check if the pokestop has been updated since our last update.
+                            if record.last_scanned < pokestop['last_modified']:
+                                pokestops_to_update[pokestop['pokestop_id']] = pokestop
                                 continue
                             else:
-                                log.debug('Skipping update of gym @ %f/%f, up to date', gym['latitude'], gym['longitude'])
+                                log.debug('Skipping update of pokestop @ %f/%f, up to date', pokestop['latitude'], pokestop['longitude'])
                                 continue
                         else:
-                            log.debug('Skipping update of gym @ %f/%f, too far away from our location at %f/%f (%fkm)', gym['latitude'], gym['longitude'], step_location[0], step_location[1], distance)
+                            log.debug('Skipping update of pokestop @ %f/%f, too far away from our location at %f/%f (%fkm)', pokestop['latitude'], pokestop['longitude'], step_location[0], step_location[1], distance)
 
-                    if len(gyms_to_update):
-                        gym_responses = {}
-                        current_gym = 1
-                        status['message'] = 'Updating {} gyms for location {},{}...'.format(len(gyms_to_update), step_location[0], step_location[1])
+                    if len(pokestops_to_update):
+                        pokestop_responses = {}
+                        current_pokestop = 1
+                        status['message'] = 'Updating {} pokestops for location {},{}...'.format(len(pokestops_to_update), step_location[0], step_location[1])
                         log.debug(status['message'])
 
-                        for gym in gyms_to_update.values():
-                            status['message'] = 'Getting details for gym {} of {} for location {},{}...'.format(current_gym, len(gyms_to_update), step_location[0], step_location[1])
-                            time.sleep(random.random() + 2)
-                            response = gym_request(api, step_location, gym)
+                        for pokestop in pokestops_to_update.values():
+                            status['message'] = 'Getting details for pokestop {} of {} for location {},{}...'.format(current_pokestop, len(pokestops_to_update), step_location[0], step_location[1])
+                            time.sleep(random.random() + 5)
+                            response = fort_request(api, step_location, pokestop)
 
-                            # Make sure the gym was in range. (sometimes the API gets cranky about gyms that are ALMOST 1km away)
-                            if response['responses']['GET_GYM_DETAILS']['result'] == 2:
-                                log.warning('Gym @ %f/%f is out of range (%dkm), skipping', gym['latitude'], gym['longitude'], distance)
+                            # Make sure the pokestop request was successful.
+                            if response['status_code'] != 1:
+                                log.warning('Error retrieving details about Pokestop %s @ %f/%f, skipping', pokestop['pokestop_id'], pokestop['latitude'], pokestop['longitude'])
                             else:
-                                gym_responses[gym['gym_id']] = response['responses']['GET_GYM_DETAILS']
+                                pokestop_responses[pokestop['pokestop_id']] = response['responses']['FORT_DETAILS']
 
-                            # Increment which gym we're on. (for status messages)
-                            current_gym += 1
+                            # Increment which pokestop we're on. (for status messages)
+                            current_pokestop += 1
 
-                        status['message'] = 'Processing details of {} gyms for location {},{}...'.format(len(gyms_to_update), step_location[0], step_location[1])
+                        status['message'] = 'Processing details of {} pokestops for location {},{}...'.format(len(pokestops_to_update), step_location[0], step_location[1])
                         log.debug(status['message'])
 
-                        if gym_responses:
-                            parse_gyms(args, gym_responses, whq)
+                        if pokestop_responses:
+                            parse_pokestops(args, pokestop_responses, whq)
 
                 # Record the time and place the worker left off at.
                 status['last_scan_time'] = now()
@@ -835,11 +849,6 @@ def gym_request(api, position, gym):
                                 gym_latitude=gym['latitude'],
                                 gym_longitude=gym['longitude'])
         x = req.check_challenge()
-        x = req.get_hatched_eggs()
-        x = req.get_inventory()
-        x = req.check_awarded_badges()
-        x = req.download_settings()
-        x = req.get_buddy_walked()
         x = req.call()
         # Print pretty(x).
         return x
@@ -848,25 +857,20 @@ def gym_request(api, position, gym):
         log.warning('Exception while downloading gym details: %s', e)
         return False
 
+
 def fort_request(api, position, fort):
     try:
         log.debug('Getting details for fort @ %f/%f (%fkm away)', fort['latitude'], fort['longitude'], calc_distance(position, [fort['latitude'], fort['longitude']]))
         req = api.create_request()
-        x = req.get_gym_details(fort_id=fort['gym_id'],
-                                latitude=f2i(position[0]),
-                                longitude=f2i(position[1]))
+        x = req.fort_details(fort_id=fort['pokestop_id'],
+                            latitude=fort['latitude'],
+                            longitude=fort['longitude'])
         x = req.check_challenge()
-        x = req.get_hatched_eggs()
-        x = req.get_inventory()
-        x = req.check_awarded_badges()
-        x = req.download_settings()
-        x = req.get_buddy_walked()
         x = req.call()
-        print x
         return x
 
     except Exception as e:
-        log.warning('Exception while downloading gym details: %s', e)
+        log.warning('Exception while downloading fort details: %s', e)
         return False
 
 
