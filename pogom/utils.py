@@ -184,8 +184,12 @@ def get_args():
                         nargs='*', default=False, dest='webhooks')
     parser.add_argument('-gi', '--gym-info', help='Get all details about gyms (causes an additional API hit for every gym).',
                         action='store_true', default=False)
+    parser.add_argument('-gid', '--gym-info-delay', help='Delay between scanning gyms.',
+                        type=int, default=5)
     parser.add_argument('-pi', '--pokestop-info', help='Get all details about pokestops (causes an additional API hit for every pokestop).',
                         action='store_true', default=False)
+    parser.add_argument('-pid', '--pokestop-info-delay', help='Delay between scanning pokestops.',
+                        type=int, default=5)
     parser.add_argument('-pdi', '--persist-detailed-information', help='Persist details about gyms and pokestops (instead of upserting).',
                         action='store_true', default=False)
     parser.add_argument('--disable-clean', help='Disable clean db loop.',

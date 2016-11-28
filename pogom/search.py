@@ -268,6 +268,7 @@ def search_overseer_thread(args, new_location_queue, pause_bit, heartb, db_updat
     scheduler_array = []
     account_queue = Queue()
     threadStatus = {}
+    threads = []
     has_started = False
 
     '''
@@ -354,8 +355,6 @@ def search_overseer_thread(args, new_location_queue, pause_bit, heartb, db_updat
             'last_scan_time': 0,
         }
 
-        threads = []
-
         t = Thread(target=search_worker_thread,
                    name='search-worker-{}'.format(i),
                    args=(args, account_queue, account_failures, search_items_queue, pause_bit,
@@ -426,7 +425,7 @@ def search_overseer_thread(args, new_location_queue, pause_bit, heartb, db_updat
 
         # quit if all queues are empty and parameter 'run once' has been specified
         if search_items_queue_size == 0 and args.run_once and has_started:
-            log.info('Queue is empty and run once was specified - let\'s quit')
+            log.info('Queue is empty and "run once" was specified - let\'s quit')
             for t in threads:
                 log.debug('Waiting for thread %s', t.name)
                 t.join()
@@ -501,11 +500,15 @@ def _generate_locations(current_location, step_distance, step_limit, worker_coun
 def search_worker_thread(args, account_queue, account_failures, search_items_queue, pause_bit, status, dbq, whq):
 
     log.debug('Search worker thread starting')
+    queue_is_empty = False
 
     # The outer forever loop restarts only when the inner one is intentionally exited - which should only be done when the worker is failing too often, and probably banned.
     # This reinitializes the API and grabs a new account from the queue.
     while True:
         try:
+            if queue_is_empty:
+                break
+
             status['starttime'] = now()
 
             # Get an account.
@@ -564,6 +567,16 @@ def search_worker_thread(args, account_queue, account_failures, search_items_que
 
                 # Grab the next thing to search (when available).
                 status['message'] = 'Waiting for item from queue'
+                empty_queue = 0
+                for i in range(3):
+                    if search_items_queue.qsize() == 0:
+                        time.sleep(10)
+                        empty_queue += 1
+                if empty_queue == 3:
+                    log.debug('Our queue is empty - quitting', )
+                    queue_is_empty = True
+                    break
+
                 step, step_location, appears, leaves = search_items_queue.get()
 
                 # Too soon?
@@ -715,7 +728,7 @@ def search_worker_thread(args, account_queue, account_failures, search_items_que
 
                         for gym in gyms_to_update.values():
                             status['message'] = 'Getting details for gym {} of {} for location {},{}...'.format(current_gym, len(gyms_to_update), step_location[0], step_location[1])
-                            time.sleep(random.random() + 5)
+                            time.sleep(random.random() + args.gym_info_delay)
                             response = gym_request(api, step_location, gym)
 
                             # Make sure the gym was in range. (sometimes the API gets cranky about gyms that are ALMOST 1km away)
@@ -766,7 +779,7 @@ def search_worker_thread(args, account_queue, account_failures, search_items_que
 
                         for pokestop in pokestops_to_update.values():
                             status['message'] = 'Getting details for pokestop {} of {} for location {},{}...'.format(current_pokestop, len(pokestops_to_update), step_location[0], step_location[1])
-                            time.sleep(random.random() + 5)
+                            time.sleep(random.random() + args.pokestop_info_delay)
                             response = fort_request(api, step_location, pokestop)
 
                             # Make sure the pokestop request was successful.
