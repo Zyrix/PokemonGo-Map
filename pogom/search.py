@@ -22,6 +22,7 @@ import math
 import os
 import random
 import time
+import calendar
 import geopy
 import geopy.distance
 import requests
@@ -353,12 +354,15 @@ def search_overseer_thread(args, new_location_queue, pause_bit, heartb, db_updat
             'last_scan_time': 0,
         }
 
+        threads = []
+
         t = Thread(target=search_worker_thread,
                    name='search-worker-{}'.format(i),
                    args=(args, account_queue, account_failures, search_items_queue, pause_bit,
                          threadStatus[workerId],
                          db_updates_queue, wh_queue))
         t.daemon = True
+        threads.append(t)
         t.start()
 
     # A place to track the current location.
@@ -423,6 +427,9 @@ def search_overseer_thread(args, new_location_queue, pause_bit, heartb, db_updat
         # quit if all queues are empty and parameter 'run once' has been specified
         if search_items_queue_size == 0 and args.run_once and has_started:
             log.info('Queue is empty and run once was specified - let\'s quit')
+            for t in threads:
+                log.debug('Waiting for thread %s', t.name)
+                t.join()
             break
 
         # Now we just give a little pause here.
@@ -708,7 +715,7 @@ def search_worker_thread(args, account_queue, account_failures, search_items_que
 
                         for gym in gyms_to_update.values():
                             status['message'] = 'Getting details for gym {} of {} for location {},{}...'.format(current_gym, len(gyms_to_update), step_location[0], step_location[1])
-                            time.sleep(random.random() + 2)
+                            time.sleep(random.random() + 5)
                             response = gym_request(api, step_location, gym)
 
                             # Make sure the gym was in range. (sometimes the API gets cranky about gyms that are ALMOST 1km away)
@@ -767,6 +774,8 @@ def search_worker_thread(args, account_queue, account_failures, search_items_que
                                 log.warning('Error retrieving details about Pokestop %s @ %f/%f, skipping', pokestop['pokestop_id'], pokestop['latitude'], pokestop['longitude'])
                             else:
                                 pokestop_responses[pokestop['pokestop_id']] = response['responses']['FORT_DETAILS']
+                                pokestop_responses[pokestop['pokestop_id']]['enabled'] = pokestop['enabled']
+                                pokestop_responses[pokestop['pokestop_id']]['last_modified_timestamp'] = calendar.timegm(pokestop['last_modified'].timetuple())
 
                             # Increment which pokestop we're on. (for status messages)
                             current_pokestop += 1

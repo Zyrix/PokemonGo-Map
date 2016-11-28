@@ -4,6 +4,7 @@ import logging
 import itertools
 import calendar
 import sys
+import copy
 import gc
 import time
 import geopy
@@ -14,6 +15,7 @@ from playhouse.flask_utils import FlaskDB
 from playhouse.pool import PooledMySQLDatabase
 from playhouse.shortcuts import RetryOperationalError
 from playhouse.migrate import migrate, MySQLMigrator, SqliteMigrator
+from pymongo import MongoClient
 from datetime import datetime, timedelta
 from base64 import b64encode
 from cachetools import TTLCache
@@ -28,6 +30,8 @@ log = logging.getLogger(__name__)
 
 args = get_args()
 flaskDb = FlaskDB()
+mongo_client = MongoClient()
+mongo_db = mongo_client.pokemon
 cache = TTLCache(maxsize=100, ttl=60 * 5)
 
 db_schema_version = 9
@@ -796,12 +800,12 @@ def parse_map(args, map_dict, step_location, db_update_queue, wh_update_queue, a
                  .where((Pokemon.disappear_time > datetime.utcnow()) & (Pokemon.encounter_id << encounter_ids))
                  .dicts())
 
-        # Store all encounter_ids and spawnpoint_id for the pokemon in query (all thats needed to make sure its unique).
+        # Store all encounter_ids and spawnpoint_id for the pokemon in query (all that's needed to make sure its unique).
         encountered_pokemon = [(p['encounter_id'], p['spawnpoint_id']) for p in query]
 
         for p in wild_pokemon:
             if (b64encode(str(p['encounter_id'])), p['spawn_point_id']) in encountered_pokemon:
-                # If pokemon has been encountered before dont process it.
+                # If pokemon has been encountered before don't process it.
                 skipped += 1
                 continue
 
@@ -883,7 +887,7 @@ def parse_map(args, map_dict, step_location, db_update_queue, wh_update_queue, a
                 else:
                     lure_expiration, active_fort_modifier = None, None
 
-                # Send all pokéstops to webhooks.
+                # Send all pokestops to webhooks.
                 if args.webhooks and not args.webhook_updates_only:
                     # Explicitly set 'webhook_data', in case we want to change the information pushed to webhooks,
                     # similar to above and previous commits.
@@ -902,10 +906,19 @@ def parse_map(args, map_dict, step_location, db_update_queue, wh_update_queue, a
                         'active_fort_modifier': active_fort_modifier
                     }))
 
+                # Don't skip pokestops when using detailed information as the query may have failed.
+                if args.pokestop_info:
+                    query = (PokestopDetails
+                             .select(PokestopDetails.pokestop_id)
+                             .where((PokestopDetails.pokestop_id << stop_ids))
+                             .dicts())
+                    encountered_pokestopdetails = [(x['pokestop_id']) for x in query]
+
+                # If pokestop has been encountered before and hasn't changed don't process it.
                 if (f['id'], int(f['last_modified_timestamp_ms'] / 1000.0)) in encountered_pokestops:
-                    # If pokestop has been encountered before and hasn't changed dont process it.
-                    stopsskipped += 1
-                    continue
+                    if (args.pokestop_info and f['id'] in encountered_pokestopdetails) or not args.pokestop_info:
+                        stopsskipped += 1
+                        continue
 
                 pokestops[f['id']] = {
                     'pokestop_id': f['id'],
@@ -979,13 +992,26 @@ def parse_gyms(args, gym_responses, wh_update_queue):
     gym_members = {}
     gym_pokemon = {}
     trainers = {}
-
-    print gym_responses
+    gym_persist = []
 
     i = 0
     for g in gym_responses.values():
         gym_state = g['gym_state']
         gym_id = gym_state['fort_data']['id']
+
+        if args.persist_detailed_information:
+            gym_state_persist = copy.deepcopy(gym_state)
+            gym_state_persist['fort_data']['name'] = g['name']
+            gym_state_persist['fort_data']['url'] = g['urls'][0]
+            gym_state_persist['fort_data']['gym_points'] = int(gym_state_persist['fort_data'].get('gym_points', 0))
+            gym_state_persist['fort_data']['last_modified_timestamp'] = gym_state_persist['fort_data']['last_modified_timestamp_ms'] / 1000
+            del gym_state_persist['fort_data']['last_modified_timestamp_ms']
+
+            # We have to convert pokemon ids to string so MongoDB can handle them.
+            for member in gym_state_persist.get('memberships', []):
+                member['pokemon_data']['id'] = str(member['pokemon_data']['id'])
+
+            gym_persist.append(gym_state_persist)
 
         gym_details[gym_id] = {
             'gym_id': gym_id,
@@ -1064,6 +1090,10 @@ def parse_gyms(args, gym_responses, wh_update_queue):
         if args.webhooks:
             wh_update_queue.put(('gym_details', webhook_data))
 
+    # Write to MongoDB.
+    if args.persist_detailed_information:
+        mongo_db.gyms.insert_many(gym_persist)
+
     # All this database stuff is synchronous (not using the upsert queue) on purpose.
     # Since the search workers load the GymDetails model from the database to determine if a gym
     # needs rescanned, we need to be sure the GymDetails get fully committed to the database before moving on.
@@ -1097,11 +1127,18 @@ def parse_gyms(args, gym_responses, wh_update_queue):
 
 def parse_pokestops(args, pokestop_responses, wh_update_queue):
     pokestop_details = {}
+    pokestop_persist = []
 
     for p in pokestop_responses.values():
+        print p
         pokestop_id = p['fort_id']
 
-        print p.get('modifiers')[0].get('deployer_player_codename') if p.get('modifiers') is not None else None
+        if args.persist_detailed_information:
+            pokestop_state_persist = copy.deepcopy(p)
+            pokestop_state_persist['url'] = pokestop_state_persist['image_urls'][0]
+            del pokestop_state_persist['image_urls']
+
+            pokestop_persist.append(pokestop_state_persist)
 
         pokestop_details[pokestop_id] = {
             'pokestop_id': pokestop_id,
@@ -1114,14 +1151,16 @@ def parse_pokestops(args, pokestop_responses, wh_update_queue):
         if args.webhooks:
             webhook_data = {
                 'id': pokestop_id,
-                'latitude': p['latitude'],
-                'longitude': p['longitude'],
                 'name': p['name'],
                 'description': g.get('description'),
                 'url': p['image_urls'][0],
                 'lure_deployer': p.get('modifiers')[0].get('deployer_player_codename') if p.get('modifiers') is not None else None,
             }
             wh_update_queue.put(('pokestop_details', webhook_data))
+
+    # Write to MongoDB.
+    if args.persist_detailed_information:
+        mongo_db.pokestops.insert_many(pokestop_persist)
 
     # All this database stuff is synchronous (not using the upsert queue) on purpose.
     # Since the search workers load the PokestopDetails model from the database to determine if a pokestop
