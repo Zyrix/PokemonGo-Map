@@ -186,6 +186,8 @@ def get_args():
                         action='store_true', default=False)
     parser.add_argument('-pi', '--pokestop-info', help='Get all details about pokestops (causes an additional API hit for every pokestop).',
                         action='store_true', default=False)
+    parser.add_argument('-pdi', '--persist-detailed-information', help='Persist details about gyms and pokestops (instead of upserting).',
+                        action='store_true', default=False)
     parser.add_argument('--disable-clean', help='Disable clean db loop.',
                         action='store_true', default=False)
     parser.add_argument('--webhook-updates-only', help='Only send updates (pokémon & lured pokéstops).',

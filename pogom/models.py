@@ -980,6 +980,8 @@ def parse_gyms(args, gym_responses, wh_update_queue):
     gym_pokemon = {}
     trainers = {}
 
+    print gym_responses
+
     i = 0
     for g in gym_responses.values():
         gym_state = g['gym_state']
