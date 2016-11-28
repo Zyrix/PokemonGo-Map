@@ -1130,7 +1130,6 @@ def parse_pokestops(args, pokestop_responses, wh_update_queue):
     pokestop_persist = []
 
     for p in pokestop_responses.values():
-        print p
         pokestop_id = p['fort_id']
 
         if args.persist_detailed_information:
