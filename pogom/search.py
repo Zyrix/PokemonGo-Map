@@ -423,7 +423,7 @@ def search_overseer_thread(args, new_location_queue, pause_bit, heartb, db_updat
         if search_items_queue_size > 0:
             has_started = True
 
-        # quit if all queues are empty and parameter 'run once' has been specified
+        # Quit if all queues are empty and parameter 'run once' has been specified.
         if search_items_queue_size == 0 and args.run_once and has_started:
             log.info('Queue is empty and "run once" was specified - let\'s quit')
             for t in threads:
@@ -567,15 +567,18 @@ def search_worker_thread(args, account_queue, account_failures, search_items_que
 
                 # Grab the next thing to search (when available).
                 status['message'] = 'Waiting for item from queue'
-                empty_queue = 0
-                for i in range(3):
-                    if search_items_queue.qsize() == 0:
-                        time.sleep(10)
-                        empty_queue += 1
-                if empty_queue == 3:
-                    log.debug('Our queue is empty - quitting', )
-                    queue_is_empty = True
-                    break
+
+                # When the parameter 'run once' is set, then wait 30 seconds for new items before quitting.
+                if args.run_once:
+                    empty_queue = 0
+                    for i in range(3):
+                        if search_items_queue.qsize() == 0:
+                            time.sleep(10)
+                            empty_queue += 1
+                    if empty_queue == 3:
+                        log.debug('Our queue is empty - quitting', )
+                        queue_is_empty = True
+                        break
 
                 step, step_location, appears, leaves = search_items_queue.get()
 
