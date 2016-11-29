@@ -1004,7 +1004,7 @@ def parse_gyms(args, gym_responses, wh_update_queue):
             gym_state_persist['fort_data']['name'] = g['name']
             gym_state_persist['fort_data']['url'] = g['urls'][0]
             gym_state_persist['fort_data']['gym_points'] = int(gym_state_persist['fort_data'].get('gym_points', 0))
-            gym_state_persist['fort_data']['last_modified_timestamp'] = gym_state_persist['fort_data']['last_modified_timestamp_ms'] / 1000
+            gym_state_persist['fort_data']['last_modified_timestamp'] = int(gym_state_persist['fort_data']['last_modified_timestamp_ms'] / 1000)
             del gym_state_persist['fort_data']['last_modified_timestamp_ms']
 
             # We have to convert pokemon ids to string so MongoDB can handle them.
