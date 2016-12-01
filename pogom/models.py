@@ -1092,7 +1092,7 @@ def parse_gyms(args, gym_responses, wh_update_queue):
 
     # Write to MongoDB.
     if args.persist_detailed_information:
-        mongo_db.gyms.insert_many(gym_persist)
+        mongo_db.gym.insert_many(gym_persist)
 
     # All this database stuff is synchronous (not using the upsert queue) on purpose.
     # Since the search workers load the GymDetails model from the database to determine if a gym
@@ -1159,7 +1159,7 @@ def parse_pokestops(args, pokestop_responses, wh_update_queue):
 
     # Write to MongoDB.
     if args.persist_detailed_information:
-        mongo_db.pokestops.insert_many(pokestop_persist)
+        mongo_db.pokestop.insert_many(pokestop_persist)
 
     # All this database stuff is synchronous (not using the upsert queue) on purpose.
     # Since the search workers load the PokestopDetails model from the database to determine if a pokestop
