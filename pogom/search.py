@@ -735,7 +735,9 @@ def search_worker_thread(args, account_queue, account_failures, search_items_que
                             response = gym_request(api, step_location, gym)
 
                             # Make sure the gym was in range. (sometimes the API gets cranky about gyms that are ALMOST 1km away)
-                            if response['responses']['GET_GYM_DETAILS']['result'] == 2:
+                            if response is None:
+                                log.warning('Error retrieving details about Gym %s @ %f/%f, skipping', gym['gym_id'], gym['latitude'], gym['longitude'])
+                            elif response['responses']['GET_GYM_DETAILS']['result'] == 2:
                                 log.warning('Gym @ %f/%f is out of range (%dkm), skipping', gym['latitude'], gym['longitude'], distance)
                             else:
                                 gym_responses[gym['gym_id']] = response['responses']['GET_GYM_DETAILS']
@@ -786,7 +788,7 @@ def search_worker_thread(args, account_queue, account_failures, search_items_que
                             response = fort_request(api, step_location, pokestop)
 
                             # Make sure the pokestop request was successful.
-                            if response['status_code'] != 1:
+                            if response is None or response['status_code'] != 1:
                                 log.warning('Error retrieving details about Pokestop %s @ %f/%f, skipping', pokestop['pokestop_id'], pokestop['latitude'], pokestop['longitude'])
                             else:
                                 pokestop_responses[pokestop['pokestop_id']] = response['responses']['FORT_DETAILS']
@@ -896,7 +898,7 @@ def gym_request(api, position, gym):
 
     except Exception as e:
         log.warning('Exception while downloading gym details: %s', e)
-        return False
+        return None
 
 
 def fort_request(api, position, fort):
@@ -912,7 +914,7 @@ def fort_request(api, position, fort):
 
     except Exception as e:
         log.warning('Exception while downloading fort details: %s', e)
-        return False
+        return None
 
 
 def token_request(args, status, url):
