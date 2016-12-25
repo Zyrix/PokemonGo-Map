@@ -1035,8 +1035,19 @@ function getGoogleSprite (index, sprite, displayHeight) {
 }
 
 function setupPokemonMarker (item, map, isBounceDisabled) {
+  var iv = 0
+  if ('individual_attack' in item) {
+    iv = (item['individual_attack'] + item['individual_defense'] + item['individual_stamina']) / 45.0 * 100
+  }
+
   // Scale icon size up with the map exponentially
   var iconSize = 2 + (map.getZoom() - 3) * (map.getZoom() - 3) * 0.2 + Store.get('iconSizeModifier')
+
+  // Display Pokémon with high IV bigger
+  if (iv > 90) {
+    iconSize += 30
+  }
+
   var pokemonIndex = item['pokemon_id'] - 1
   var sprite = pokemonSprites[Store.get('pokemonIcons')] || pokemonSprites['highres']
   var icon = getGoogleSprite(pokemonIndex, sprite, iconSize)
