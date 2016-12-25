@@ -37,7 +37,6 @@ var map
 var rawDataIsLoading = false
 var locationMarker
 var rangeMarkers = ['pokemon', 'pokestop', 'gym']
-var searchMarker
 var storeZoom = true
 var scanPath
 var moves
@@ -188,7 +187,6 @@ function initMap () { // eslint-disable-line no-unused-vars
     redrawPokemon(mapData.lurePokemons)
   })
 
-  searchMarker = createSearchMarker()
   locationMarker = createLocationMarker()
   createMyLocationButton()
   initSidebar()
@@ -243,57 +241,6 @@ function createLocationMarker () {
   })
 
   return locationMarker
-}
-
-function updateSearchMarker (style) {
-  if (style in searchMarkerStyles) {
-    searchMarker.setIcon(searchMarkerStyles[style].icon)
-    Store.set('searchMarkerStyle', style)
-  }
-
-  return searchMarker
-}
-
-function createSearchMarker () {
-  var searchMarker = new google.maps.Marker({ // need to keep reference.
-    position: {
-      lat: centerLat,
-      lng: centerLng
-    },
-    map: map,
-    animation: google.maps.Animation.DROP,
-    draggable: !Store.get('lockMarker'),
-    icon: null,
-    optimized: false,
-    zIndex: google.maps.Marker.MAX_ZINDEX + 1
-  })
-
-  searchMarker.infoWindow = new google.maps.InfoWindow({
-    content: '<div><b>Search Location</b></div>',
-    disableAutoPan: true
-  })
-
-  addListeners(searchMarker)
-
-  var oldLocation = null
-  google.maps.event.addListener(searchMarker, 'dragstart', function () {
-    oldLocation = searchMarker.getPosition()
-  })
-
-  google.maps.event.addListener(searchMarker, 'dragend', function () {
-    var newLocation = searchMarker.getPosition()
-    changeSearchLocation(newLocation.lat(), newLocation.lng())
-      .done(function () {
-        oldLocation = null
-      })
-      .fail(function () {
-        if (oldLocation) {
-          searchMarker.setPosition(oldLocation)
-        }
-      })
-  })
-
-  return searchMarker
 }
 
 var searchControlURI = 'search_control'
@@ -1323,7 +1270,7 @@ function sendNotification (title, text, icon, lat, lng) {
       window.focus()
       notification.close()
 
-      centerMap(lat, lng, 20)
+      centerMap(lat, lng, 15)
     }
   }
 }
@@ -1395,18 +1342,6 @@ function centerMapOnLocation () {
   }
 }
 
-function changeLocation (lat, lng) {
-  var loc = new google.maps.LatLng(lat, lng)
-  changeSearchLocation(lat, lng).done(function () {
-    map.setCenter(loc)
-    searchMarker.setPosition(loc)
-  })
-}
-
-function changeSearchLocation (lat, lng) {
-  return $.post('next_loc?lat=' + lat + '&lon=' + lng, {})
-}
-
 function centerMap (lat, lng, zoom) {
   var loc = new google.maps.LatLng(lat, lng)
 
@@ -1448,15 +1383,6 @@ function updateGeoLocation () {
       var lng = position.coords.longitude
       var center = new google.maps.LatLng(lat, lng)
 
-      if (Store.get('geoLocate')) {
-        // the search function makes any small movements cause a loop. Need to increase resolution
-        if ((typeof searchMarker !== 'undefined') && (getPointDistance(searchMarker.getPosition(), center) > 40)) {
-          $.post('next_loc?lat=' + lat + '&lon=' + lng).done(function () {
-            map.panTo(center)
-            searchMarker.setPosition(center)
-          })
-        }
-      }
       if (Store.get('followMyLocation')) {
         if ((typeof locationMarker !== 'undefined') && (getPointDistance(locationMarker.getPosition(), center) >= 5)) {
           map.panTo(center)
@@ -1806,15 +1732,7 @@ $(function () {
       minimumResultsForSearch: Infinity
     })
 
-    $selectSearchIconMarker.on('change', function (e) {
-      var selectSearchIconMarker = $selectSearchIconMarker.val()
-      Store.set('searchMarkerStyle', selectSearchIconMarker)
-      updateSearchMarker(selectSearchIconMarker)
-    })
-
     $selectSearchIconMarker.val(Store.get('searchMarkerStyle')).trigger('change')
-
-    updateSearchMarker(Store.get('lockMarker'))
 
     $selectLocationIconMarker.select2({
       placeholder: 'Standortmarkierung wählen',
@@ -1967,7 +1885,7 @@ $(function () {
   // run interval timers to regularly update map and timediffs
   window.setInterval(updateLabelDiffTime, 1000)
   window.setInterval(updateMap, 20000) // 5000 -> 20000
-  window.setInterval(updateGeoLocation, 1000)
+  window.setInterval(updateGeoLocation, 5000)
 
   createUpdateWorker()
 
@@ -2062,15 +1980,6 @@ $(function () {
     } else {
       Store.set('geoLocate', this.checked)
     }
-  })
-
-  $('#lock-marker-switch').change(function () {
-    Store.set('lockMarker', this.checked)
-    searchMarker.setDraggable(!this.checked)
-  })
-
-  $('#search-switch').change(function () {
-    searchControl(this.checked ? 'on' : 'off')
   })
 
   $('#start-at-user-location-switch').change(function () {
