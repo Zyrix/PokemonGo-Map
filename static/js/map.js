@@ -1814,7 +1814,7 @@ $(function () {
 
     $selectSearchIconMarker.val(Store.get('searchMarkerStyle')).trigger('change')
 
-    updateSearchMarker(Store.get('none'))
+    updateSearchMarker(Store.get('lockMarker'))
 
     $selectLocationIconMarker.select2({
       placeholder: 'Standortmarkierung wählen',

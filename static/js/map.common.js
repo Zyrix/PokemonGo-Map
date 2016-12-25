@@ -959,11 +959,11 @@ var StoreOptions = {
     type: StoreTypes.Number
   },
   'searchMarkerStyle': {
-    default: 'google',
+    default: 'none',
     type: StoreTypes.String
   },
   'locationMarkerStyle': {
-    default: 'none',
+    default: 'google',
     type: StoreTypes.String
   },
   'gymMarkerStyle': {
