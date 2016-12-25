@@ -1856,6 +1856,16 @@ $(function () {
     return $state
   }
 
+  function formatRarity (state) {
+    if (!state.id) {
+      return state.text
+    }
+    var $state = $(
+      '<span>' + state.text + '</span>'
+    )
+    return $state
+  }
+
   if (Store.get('startAtUserLocation')) {
     centerMapOnLocation()
   }
@@ -1897,19 +1907,19 @@ $(function () {
 
     // setup the filter lists
     $selectExclude.select2({
-      placeholder: i8ln('Select Pokémon'),
+      placeholder: 'Pokémon wählen',
       data: pokeList,
       templateResult: formatState
     })
     $selectPokemonNotify.select2({
-      placeholder: i8ln('Select Pokémon'),
+      placeholder: 'Pokémon wählen',
       data: pokeList,
       templateResult: formatState
     })
     $selectRarityNotify.select2({
-      placeholder: i8ln('Select Rarity'),
+      placeholder: 'Seltenheit wählen',
       data: [i8ln('Common'), i8ln('Uncommon'), i8ln('Rare'), i8ln('Very Rare'), i8ln('Ultra Rare')],
-      templateResult: formatState
+      templateResult: formatRarity
     })
 
     // setup list change behavior now that we have the list to work from
