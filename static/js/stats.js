@@ -1,7 +1,7 @@
 function countMarkers (map) { // eslint-disable-line no-unused-vars
   document.getElementById('stats-ldg-label').innerHTML = ''
   document.getElementById('stats-pkmn-label').innerHTML = 'Pokémon'
-  document.getElementById('stats-gym-label').innerHTML = 'Gyms'
+  document.getElementById('stats-gym-label').innerHTML = 'Arenen'
   document.getElementById('stats-pkstop-label').innerHTML = 'PokéStops'
 
   var i = 0
@@ -47,7 +47,7 @@ function countMarkers (map) { // eslint-disable-line no-unused-vars
         pokeCounts.push(
           [
             '<img src=\'static/icons/' + pkmnCount[i].ID + '.png\' />',
-            '<a href=\'http://www.pokemon.com/us/pokedex/' + pkmnCount[i].ID + '\' target=\'_blank\' title=\'View in Pokédex\' style=\'color: black;\'>' + pkmnCount[i].Name + '</a>',
+            '<a href=\'http://www.pokemon.com/de/pokedex/' + pkmnCount[i].ID + '\' target=\'_blank\' title=\'Im Pokédex anzeigen\' style=\'color: black;\'>' + pkmnCount[i].Name + '</a>',
             pkmnCount[i].Count,
             (Math.round(pkmnCount[i].Count * 100 / pkmnTotal * 10) / 10) + '%'
           ]
@@ -67,7 +67,7 @@ function countMarkers (map) { // eslint-disable-line no-unused-vars
       .clear()
       .draw()
 
-    document.getElementById('pokeStatStatus').innerHTML = 'Pokémon markers are disabled'
+    document.getElementById('pokeStatStatus').innerHTML = 'Pokémon sind ausgeblendet'
     $('#pokemonList_table').dataTable().hide()
   }   // end Pokémon processing
 
@@ -87,24 +87,24 @@ function countMarkers (map) { // eslint-disable-line no-unused-vars
       }
     })
 
-    var arenaListString = '<table><th>Icon</th><th>Team Color</th><th>Count</th><th>%</th><tr><td></td><td>Total</td><td>' + arenaTotal + '</td></tr>'
+    var arenaListString = '<table><th>Icon</th><th>Team Farbe</th><th>Anzahl</th><th>%</th><tr><td></td><td>Summe</td><td>' + arenaTotal + '</td></tr>'
     for (i = 0; i < arenaCount.length; i++) {
       if (arenaCount[i] > 0) {
         if (i === 1) {
-          arenaListString += '<tr><td><img src="static/forts/Mystic.png" /></td><td>' + 'Blue' + '</td><td>' + arenaCount[i] + '</td><td>' + Math.round(arenaCount[i] * 100 / arenaTotal * 10) / 10 + '%</td></tr>'
+          arenaListString += '<tr><td><img src="static/forts/Mystic.png" /></td><td>' + 'Blau' + '</td><td>' + arenaCount[i] + '</td><td>' + Math.round(arenaCount[i] * 100 / arenaTotal * 10) / 10 + '%</td></tr>'
         } else if (i === 2) {
-          arenaListString += '<tr><td><img src="static/forts/Valor.png" /></td><td>' + 'Red' + '</td><td>' + arenaCount[i] + '</td><td>' + Math.round(arenaCount[i] * 100 / arenaTotal * 10) / 10 + '%</td></tr>'
+          arenaListString += '<tr><td><img src="static/forts/Valor.png" /></td><td>' + 'Rot' + '</td><td>' + arenaCount[i] + '</td><td>' + Math.round(arenaCount[i] * 100 / arenaTotal * 10) / 10 + '%</td></tr>'
         } else if (i === 3) {
-          arenaListString += '<tr><td><img src="static/forts/Instinct.png" /></td><td>' + 'Yellow' + '</td><td>' + arenaCount[i] + '</td><td>' + Math.round(arenaCount[i] * 100 / arenaTotal * 10) / 10 + '%</td></tr>'
+          arenaListString += '<tr><td><img src="static/forts/Instinct.png" /></td><td>' + 'Gelb' + '</td><td>' + arenaCount[i] + '</td><td>' + Math.round(arenaCount[i] * 100 / arenaTotal * 10) / 10 + '%</td></tr>'
         } else {
-          arenaListString += '<tr><td><img src="static/forts/Uncontested.png" /></td><td>' + 'Clear' + '</td><td>' + arenaCount[i] + '</td><td>' + Math.round(arenaCount[i] * 100 / arenaTotal * 10) / 10 + '%</td></tr>'
+          arenaListString += '<tr><td><img src="static/forts/Uncontested.png" /></td><td>' + 'Leer' + '</td><td>' + arenaCount[i] + '</td><td>' + Math.round(arenaCount[i] * 100 / arenaTotal * 10) / 10 + '%</td></tr>'
         }
       }
     }
     arenaListString += '</table>'
     document.getElementById('arenaList').innerHTML = arenaListString
   } else {
-    document.getElementById('arenaList').innerHTML = 'Gyms markers are disabled'
+    document.getElementById('arenaList').innerHTML = 'Arenen sind ausgeblendet'
   }
 
   if (Store.get('showPokestops')) {
@@ -129,19 +129,19 @@ function countMarkers (map) { // eslint-disable-line no-unused-vars
         pokestopTotal++
       }
     })
-    var pokestopListString = '<table><th>Icon</th><th>Status</th><th>Count</th><th>%</th><tr><td></td><td>Total</td><td>' + pokestopTotal + '</td></tr>'
+    var pokestopListString = '<table><th>Symbol</th><th>Status</th><th>Anzahl</th><th>%</th><tr><td></td><td>Summe</td><td>' + pokestopTotal + '</td></tr>'
     for (i = 0; i < pokestopCount.length; i++) {
       if (pokestopCount[i] > 0) {
         if (i === 0) {
-          pokestopListString += '<tr><td><img src="static/forts/Pstop.png" /></td><td>' + 'Not Lured' + '</td><td>' + pokestopCount[i] + '</td><td>' + Math.round(pokestopCount[i] * 100 / pokestopTotal * 10) / 10 + '%</td></tr>'
+          pokestopListString += '<tr><td><img src="static/forts/Pstop.png" /></td><td>' + 'Ohne Lockmodul' + '</td><td>' + pokestopCount[i] + '</td><td>' + Math.round(pokestopCount[i] * 100 / pokestopTotal * 10) / 10 + '%</td></tr>'
         } else if (i === 1) {
-          pokestopListString += '<tr><td><img src="static/forts/PstopLured.png" /></td><td>' + 'Lured' + '</td><td>' + pokestopCount[i] + '</td><td>' + Math.round(pokestopCount[i] * 100 / pokestopTotal * 10) / 10 + '%</td></tr>'
+          pokestopListString += '<tr><td><img src="static/forts/PstopLured.png" /></td><td>' + 'mit Lockmodul' + '</td><td>' + pokestopCount[i] + '</td><td>' + Math.round(pokestopCount[i] * 100 / pokestopTotal * 10) / 10 + '%</td></tr>'
         }
       }
     }
     pokestopListString += '</table>'
     document.getElementById('pokestopList').innerHTML = pokestopListString
   } else {
-    document.getElementById('pokestopList').innerHTML = 'PokéStops markers are disabled'
+    document.getElementById('pokestopList').innerHTML = 'PokéStops sind ausgeblendet'
   }
 }

@@ -231,7 +231,7 @@ function createLocationMarker () {
   })
 
   locationMarker.infoWindow = new google.maps.InfoWindow({
-    content: '<div><b>My Location</b></div>',
+    content: '<div><b>Mein Standort</b></div>',
     disableAutoPan: true
   })
 
@@ -329,8 +329,8 @@ function initSidebar () {
   var searchBox = new google.maps.places.Autocomplete(document.getElementById('next-location'))
   $('#next-location').css('background-color', $('#geoloc-switch').prop('checked') ? '#e0e0e0' : '#ffffff')
 
-  updateSearchStatus()
-  setInterval(updateSearchStatus, 5000)
+  //updateSearchStatus()
+  //setInterval(updateSearchStatus, 5000)
 
   searchBox.addListener('place_changed', function () {
     var place = searchBox.getPlace()
@@ -387,25 +387,25 @@ function pokemonLabel (name, rarity, types, disappearTime, id, latitude, longitu
       <b>${name}</b>
       <span> - </span>
       <small>
-        <a href='http://www.pokemon.com/us/pokedex/${id}' target='_blank' title='View in Pokedex'>#${id}</a>
+        <a href='http://www.pokemon.com/de/pokedex/${id}' target='_blank' title='Im Pokedex anzeigen'>#${id}</a>
       </small>
       <span> ${rarityDisplay}</span>
       <span> - </span>
       <small>${typesDisplay}</small>
     </div>
     <div>
-      Disappears at ${pad(disappearDate.getHours())}:${pad(disappearDate.getMinutes())}:${pad(disappearDate.getSeconds())}
+      Verschwindet um ${pad(disappearDate.getHours())}:${pad(disappearDate.getMinutes())}:${pad(disappearDate.getSeconds())}
       <span class='label-countdown' disappears-at='${disappearTime}'>(00m00s)</span>
     </div>
     <div>
-      Location: ${latitude.toFixed(6)}, ${longitude.toFixed(7)}
+      Koordinaten: ${latitude.toFixed(6)}, ${longitude.toFixed(7)}
     </div>
       ${details}
     <div>
-      <a href='javascript:excludePokemon(${id})'>Exclude</a>&nbsp;&nbsp
-      <a href='javascript:notifyAboutPokemon(${id})'>Notify</a>&nbsp;&nbsp
-      <a href='javascript:removePokemonMarker("${encounterId}")'>Remove</a>&nbsp;&nbsp
-      <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='View in Maps'>Get directions</a>
+      <a href='javascript:excludePokemon(${id})'>Verstecken</a>&nbsp;&nbsp
+      <a href='javascript:notifyAboutPokemon(${id})'>Benachrichtigen</a>&nbsp;&nbsp
+      <a href='javascript:removePokemonMarker("${encounterId}")'>Entfernen</a>&nbsp;&nbsp
+      <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='View in Maps'>Navigation</a>
     </div>`
   return contentstring
 }
@@ -430,7 +430,7 @@ function gymLabel (teamName, teamId, gymPoints, latitude, longitude, lastScanned
   var directionsStr = ''
   if (!Store.get('useGymSidebar')) {
     directionsStr = `<div>
-        <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='View in Maps'>Get directions</a>
+        <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='Auf Karte anzeigen'>Navigation</a>
       </div>`
   }
 
@@ -517,7 +517,7 @@ function pokestopLabel (expireTime, latitude, longitude) {
         Location: ${latitude.toFixed(6)}, ${longitude.toFixed(7)}
       </div>
       <div>
-        <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='View in Maps'>Get directions</a>
+        <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='Auf Karte anzeigen'>Get directions</a>
       </div>`
   } else {
     str = `
@@ -528,7 +528,7 @@ function pokestopLabel (expireTime, latitude, longitude) {
         Location: ${latitude.toFixed(6)}, ${longitude.toFixed(7)}
       </div>
       <div>
-        <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='View in Maps'>Get directions</a>
+        <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='Auf Karte anzeigen'>Get directions</a>
       </div>`
   }
 
@@ -625,7 +625,7 @@ function customizePokemonMarker (marker, item, skipNotification) {
       if (Store.get('playSound')) {
         audio.play()
       }
-      sendNotification('A wild ' + item['pokemon_name'] + ' appeared!', 'Click to load map', 'static/icons/' + item['pokemon_id'] + '.png', item['latitude'], item['longitude'])
+      sendNotification('Ein wildes ' + item['pokemon_name'] + ' erscheint!', 'Klicken um Karte zu laden', 'static/icons/' + item['pokemon_id'] + '.png', item['latitude'], item['longitude'])
     }
     if (marker.animationDisabled !== true) {
       marker.setAnimation(google.maps.Animation.BOUNCE)
@@ -639,7 +639,7 @@ function customizePokemonMarker (marker, item, skipNotification) {
         if (Store.get('playSound')) {
           audio.play()
         }
-        sendNotification('A ' + perfection.toFixed(1) + '% perfect ' + item['pokemon_name'] + ' appeared!', 'Click to load map', 'static/icons/' + item['pokemon_id'] + '.png', item['latitude'], item['longitude'])
+        sendNotification('Ein ' + perfection.toFixed(1) + '% perfektes ' + item['pokemon_name'] + ' erscheint!', 'Klicken um Karte zu laden', 'static/icons/' + item['pokemon_id'] + '.png', item['latitude'], item['longitude'])
       }
       if (marker.animationDisabled !== true) {
         marker.setAnimation(google.maps.Animation.BOUNCE)
@@ -1474,7 +1474,8 @@ function createUpdateWorker () {
       var updateBlob = new Blob([`onmessage = function(e) {
         var data = e.data
         if (data.name === 'backgroundUpdate') {
-          self.setInterval(function () {self.postMessage({name: 'backgroundUpdate'})}, 5000)
+          // 5000 -> 20000
+          self.setInterval(function () {self.postMessage({name: 'backgroundUpdate'})}, 20000)
         }
       }`])
 
@@ -1484,7 +1485,8 @@ function createUpdateWorker () {
 
       updateWorker.onmessage = function (e) {
         var data = e.data
-        if (document.hidden && data.name === 'backgroundUpdate' && Date.now() - lastUpdateTime > 2500) {
+        // 2500 -> 10000
+        if (document.hidden && data.name === 'backgroundUpdate' && Date.now() - lastUpdateTime > 10000) {
           updateMap()
           updateGeoLocation()
         }
@@ -1711,7 +1713,7 @@ $(function () {
 
     // setup the stylelist
     $selectStyle.select2({
-      placeholder: 'Select Style',
+      placeholder: 'Style wählen',
       data: styleList,
       minimumResultsForSearch: Infinity
     })
@@ -1730,7 +1732,7 @@ $(function () {
   $selectIconResolution = $('#pokemon-icons')
 
   $selectIconResolution.select2({
-    placeholder: 'Select Icon Resolution',
+    placeholder: 'Symbolauslösung wählen',
     minimumResultsForSearch: Infinity
   })
 
@@ -1743,7 +1745,7 @@ $(function () {
   $selectIconSize = $('#pokemon-icon-size')
 
   $selectIconSize.select2({
-    placeholder: 'Select Icon Size',
+    placeholder: 'Symbolgröße wählen',
     minimumResultsForSearch: Infinity
   })
 
@@ -1756,7 +1758,7 @@ $(function () {
   $selectLuredPokestopsOnly = $('#lured-pokestops-only-switch')
 
   $selectLuredPokestopsOnly.select2({
-    placeholder: 'Only Show Lured Pokestops',
+    placeholder: 'Zeige nur angelockte Pokestops',
     minimumResultsForSearch: Infinity
   })
 
@@ -1799,7 +1801,7 @@ $(function () {
     })
 
     $selectSearchIconMarker.select2({
-      placeholder: 'Select Icon Marker',
+      placeholder: 'Symbolmarkierung wählen',
       data: searchMarkerStyleList,
       minimumResultsForSearch: Infinity
     })
@@ -1812,10 +1814,10 @@ $(function () {
 
     $selectSearchIconMarker.val(Store.get('searchMarkerStyle')).trigger('change')
 
-    updateSearchMarker(Store.get('lockMarker'))
+    updateSearchMarker(Store.get('none'))
 
     $selectLocationIconMarker.select2({
-      placeholder: 'Select Location Marker',
+      placeholder: 'Standortmarkierung wählen',
       data: searchMarkerStyleList,
       minimumResultsForSearch: Infinity
     })
@@ -1831,7 +1833,7 @@ $(function () {
   $selectGymMarkerStyle = $('#gym-marker-style')
 
   $selectGymMarkerStyle.select2({
-    placeholder: 'Select Style',
+    placeholder: 'Style wählen',
     minimumResultsForSearch: Infinity
   })
 
@@ -1950,9 +1952,11 @@ $(function () {
     }
   })
 
+  window.setTimeout(updateMap, 1000) // added
+
   // run interval timers to regularly update map and timediffs
   window.setInterval(updateLabelDiffTime, 1000)
-  window.setInterval(updateMap, 5000)
+  window.setInterval(updateMap, 20000) // 5000 -> 20000
   window.setInterval(updateGeoLocation, 1000)
 
   createUpdateWorker()

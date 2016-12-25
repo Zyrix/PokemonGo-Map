@@ -1,5 +1,5 @@
 /* Shared */
-var monthArray = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+var monthArray = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez']
 
 /* Main stats page */
 var rawDataIsLoading = false
@@ -64,9 +64,9 @@ function addElement (pokemonId, name) {
 
   jQuery('<a/>', {
     id: 'link_' + pokemonId,
-    href: 'http://www.pokemon.com/us/pokedex/' + pokemonId,
+    href: 'http://www.pokemon.com/de/pokedex/' + pokemonId,
     target: '_blank',
-    title: 'View in Pokedex',
+    title: 'Im Pokedex anzeigen',
     text: name
   }).appendTo('#name_' + pokemonId)
 
@@ -93,7 +93,7 @@ function addElement (pokemonId, name) {
   jQuery('<a/>', {
     href: 'javascript:void(0);',
     onclick: 'javascript:showOverlay(' + pokemonId + ');',
-    text: 'All Locations'
+    text: 'Alle Standorte'
   }).appendTo('#seen_' + pokemonId + '_details')
 }
 
@@ -145,9 +145,9 @@ function processSeen (seen) {
     if (!$('#seen_' + item['pokemon_id']).length) {
       addElement(item['pokemon_id'], item['pokemon_name'])
     }
-    $('#count_' + item['pokemon_id']).html('<strong>Seen:</strong> ' + item['count'].toLocaleString() + ' (' + percentage + '%)')
-    $('#lastseen_' + item['pokemon_id']).html('<strong>Last Seen:</strong> ' + lastSeen)
-    $('#location_' + item['pokemon_id']).html('<strong>Location:</strong> ' + location)
+    $('#count_' + item['pokemon_id']).html('<strong>Anzahl:</strong> ' + item['count'].toLocaleString() + ' (' + percentage + '%)')
+    $('#lastseen_' + item['pokemon_id']).html('<strong>Letzte Sichtung:</strong> ' + lastSeen)
+    $('#location_' + item['pokemon_id']).html('<strong>Letzter Standort:</strong> ' + location)
     $('#seen_' + item['pokemon_id']).show()
     // Reverting to classic javascript here as it's supposed to increase performance
     document.getElementById('seen_container').insertBefore(document.getElementById('seen_' + item['pokemon_id']), document.getElementById('seen_container').childNodes[0])
@@ -161,12 +161,12 @@ function processSeen (seen) {
     }
   }
 
-  document.getElementById('seen_total').innerHTML = 'Total: ' + total.toLocaleString()
+  document.getElementById('seen_total').innerHTML = 'Summe: ' + total.toLocaleString()
 }
 
 function updateStatMap (firstRun) {
   var duration = document.getElementById('duration')
-  var header = 'Pokemon Seen in ' + duration.options[duration.selectedIndex].text
+  var header = 'Pokémon gesehen (' + duration.options[duration.selectedIndex].text + ')'
   if ($('#seen_header').html() !== header) {
     $('#seen_container').hide()
     $('#loading').show()
