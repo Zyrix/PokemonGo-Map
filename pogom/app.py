@@ -14,7 +14,7 @@ from datetime import timedelta
 from collections import OrderedDict
 
 from . import config
-from .models import Pokemon, Gym, Pokestop, ScannedLocation, MainWorker, WorkerStatus
+from .models import Pokemon, PokemonCurrent, Gym, Pokestop, ScannedLocation, MainWorker, WorkerStatus
 from .utils import now
 log = logging.getLogger(__name__)
 compress = Compress()
@@ -28,7 +28,7 @@ class Pogom(Flask):
         self.route("/", methods=['GET'])(self.fullmap)
         self.route("/raw_data", methods=['GET'])(self.raw_data)
         self.route("/loc", methods=['GET'])(self.loc)
-        self.route("/next_loc", methods=['POST'])(self.next_loc)
+        #self.route("/next_loc", methods=['POST'])(self.next_loc)
         self.route("/mobile", methods=['GET'])(self.list_pokemon)
         self.route("/search_control", methods=['GET'])(self.get_search_control)
         self.route("/search_control", methods=['POST'])(self.post_search_control)
@@ -100,6 +100,7 @@ class Pogom(Flask):
         if request.args.get('timestamp'):
             timestamp = int(request.args.get('timestamp'))
             timestamp -= 1000  # Overlap, for rounding errors.
+            timestamp -= 60000 # make sure to get all Pokemon since last update.
         else:
             timestamp = 0
 
@@ -158,17 +159,17 @@ class Pogom(Flask):
         if request.args.get('pokemon', 'true') == 'true':
             if request.args.get('ids'):
                 ids = [int(x) for x in request.args.get('ids').split(',')]
-                d['pokemons'] = Pokemon.get_active_by_id(ids, swLat, swLng,
+                d['pokemons'] = PokemonCurrent.get_active_by_id(ids, swLat, swLng,
                                                          neLat, neLng)
             elif lastpokemon != 'true':
                 # If this is first request since switch on, load all pokemon on screen.
-                d['pokemons'] = Pokemon.get_active(swLat, swLng, neLat, neLng)
+                d['pokemons'] = PokemonCurrent.get_active(swLat, swLng, neLat, neLng)
             else:
                 # If map is already populated only request modified Pokemon since last request time.
-                d['pokemons'] = Pokemon.get_active(swLat, swLng, neLat, neLng, timestamp=timestamp)
+                d['pokemons'] = PokemonCurrent.get_active(swLat, swLng, neLat, neLng, timestamp=timestamp)
                 if newArea:
                     # If screen is moved add newly uncovered Pokemon to the ones that were modified since last request time.
-                    d['pokemons'] = d['pokemons'] + (Pokemon.get_active(swLat, swLng, neLat, neLng, oSwLat=oSwLat, oSwLng=oSwLng, oNeLat=oNeLat, oNeLng=oNeLng))
+                    d['pokemons'] = d['pokemons'] + (PokemonCurrent.get_active(swLat, swLng, neLat, neLng, oSwLat=oSwLat, oSwLng=oSwLng, oNeLat=oNeLat, oNeLng=oNeLng))
 
             if request.args.get('eids'):
                 # Exclude id's of pokemon that are hidden.
@@ -177,7 +178,7 @@ class Pogom(Flask):
 
             if request.args.get('reids'):
                 reids = [int(x) for x in request.args.get('reids').split(',')]
-                d['pokemons'] = d['pokemons'] + (Pokemon.get_active_by_id(reids, swLat, swLng, neLat, neLng))
+                d['pokemons'] = d['pokemons'] + (PokemonCurrent.get_active_by_id(reids, swLat, swLng, neLat, neLng))
                 d['reids'] = reids
 
         if request.args.get('pokestops', 'true') == 'true':
@@ -280,7 +281,7 @@ class Pogom(Flask):
         lon = request.args.get('lon', self.current_location[1], type=float)
         origin_point = LatLng.from_degrees(lat, lon)
 
-        for pokemon in Pokemon.get_active(None, None, None, None):
+        for pokemon in PokemonCurrent.get_active(None, None, None, None):
             pokemon_point = LatLng.from_degrees(pokemon['latitude'],
                                                 pokemon['longitude'])
             diff = pokemon_point - origin_point

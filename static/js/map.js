@@ -329,8 +329,8 @@ function initSidebar () {
   var searchBox = new google.maps.places.Autocomplete(document.getElementById('next-location'))
   $('#next-location').css('background-color', $('#geoloc-switch').prop('checked') ? '#e0e0e0' : '#ffffff')
 
-  updateSearchStatus()
-  setInterval(updateSearchStatus, 5000)
+  // updateSearchStatus()
+  // setInterval(updateSearchStatus, 5000)
 
   searchBox.addListener('place_changed', function () {
     var place = searchBox.getPlace()
@@ -1490,7 +1490,7 @@ function createUpdateWorker () {
       var updateBlob = new Blob([`onmessage = function(e) {
         var data = e.data
         if (data.name === 'backgroundUpdate') {
-          self.setInterval(function () {self.postMessage({name: 'backgroundUpdate'})}, 5000)
+          self.setInterval(function () {self.postMessage({name: 'backgroundUpdate'})}, 20000) // 5000 -> 20000
         }
       }`])
 
@@ -1500,7 +1500,8 @@ function createUpdateWorker () {
 
       updateWorker.onmessage = function (e) {
         var data = e.data
-        if (document.hidden && data.name === 'backgroundUpdate' && Date.now() - lastUpdateTime > 2500) {
+        // 2500 -> 10000
+        if (document.hidden && data.name === 'backgroundUpdate' && Date.now() - lastUpdateTime > 10000) {
           updateMap()
           updateGeoLocation()
         }
@@ -1966,9 +1967,11 @@ $(function () {
     }
   })
 
+  window.setTimeout(updateMap, 1000) // added
+
   // run interval timers to regularly update map and timediffs
   window.setInterval(updateLabelDiffTime, 1000)
-  window.setInterval(updateMap, 5000)
+  window.setInterval(updateMap, 20000) // 5000 -> 20000
   window.setInterval(updateGeoLocation, 1000)
 
   createUpdateWorker()
