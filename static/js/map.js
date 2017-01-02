@@ -1874,7 +1874,7 @@ $(function () {
 
   $showTimers = $('#timer-switch')
 
-  $showTimers.on('change', function() {
+  $showTimers.on('change', function () {
     Store.set('showTimers', this.checked)
     redrawPokemon(mapData.pokemons)
     redrawPokemon(mapData.lurePokemons)
