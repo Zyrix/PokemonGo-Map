@@ -1087,7 +1087,7 @@ function setupPokemonMarker (item, map, perfectionLimit, isBounceDisabled) {
   var pokemonIndex = item['pokemon_id'] - 1
   var sprite = pokemonSprites[Store.get('pokemonIcons')] || pokemonSprites['highres']
   var icon = getGoogleSprite(pokemonIndex, sprite, iconSize)
-  var timerHide = Store.get('hideTimersAtZoomLevel')
+  var hideTimersAtZoomLevel = Store.get('hideTimersAtZoomLevel')
   var showTimers = Store.get('showTimers')
 
   var animationDisabled = false
@@ -1097,7 +1097,7 @@ function setupPokemonMarker (item, map, perfectionLimit, isBounceDisabled) {
 
   var marker = 1
 
-  if (showTimers && map.getZoom() >= timerHide) {
+  if (showTimers && map.getZoom() >= hideTimersAtZoomLevel) {
     marker = new MarkerWithLabel({ // eslint-disable-line no-undef
       position: {
         lat: item['latitude'],
