@@ -621,11 +621,13 @@ function setupGymMarker (item) {
       marker.persist = null
     })
 
-    marker.addListener('mouseover', function () {
-      marker.infoWindow.open(map, marker)
-      clearSelection()
-      updateLabelDiffTime()
-    })
+	if (!isMobileDevice() && !isTouchDevice()) {
+      marker.addListener('mouseover', function () {
+        marker.infoWindow.open(map, marker)
+        clearSelection()
+        updateLabelDiffTime()
+      })
+    }
 
     marker.addListener('mouseout', function () {
       if (!marker.persist) {
@@ -815,11 +817,13 @@ function addListeners (marker) {
     marker.persist = null
   })
 
-  marker.addListener('mouseover', function () {
-    marker.infoWindow.open(map, marker)
-    clearSelection()
-    updateLabelDiffTime()
-  })
+  if (!isMobileDevice() && !isTouchDevice()) {
+    marker.addListener('mouseover', function () {
+      marker.infoWindow.open(map, marker)
+      clearSelection()
+      updateLabelDiffTime()
+    })
+  }
 
   marker.addListener('mouseout', function () {
     if (!marker.persist) {
