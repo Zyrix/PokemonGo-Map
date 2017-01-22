@@ -169,18 +169,40 @@ class Pogom(Flask):
                                                          neLat, neLng)
             elif lastpokemon != 'true':
                 # If this is first request since switch on, load all pokemon on screen.
-                d['pokemons'] = PokemonCurrent.get_active(swLat, swLng, neLat, neLng)
+                if request.args.get('eids'):
+                    eids = [int(x) for x in request.args.get('eids').split(',')]
+                    d['pokemons'] = PokemonCurrent.get_active_by_eid(eids, swLat, swLng, neLat, neLng)
+                else:
+                    d['pokemons'] = PokemonCurrent.get_active(swLat, swLng, neLat, neLng)
             else:
                 # If map is already populated only request modified Pokemon since last request time.
-                d['pokemons'] = PokemonCurrent.get_active(swLat, swLng, neLat, neLng, timestamp=timestamp)
+                if request.args.get('eids'):
+                    eids = [int(x) for x in request.args.get('eids').split(',')]
+                    d['pokemons'] = PokemonCurrent.get_active_by_eid(eids, swLat, swLng, neLat, neLng, timestamp=timestamp)
+                else:
+                    d['pokemons'] = PokemonCurrent.get_active(swLat, swLng, neLat, neLng, timestamp=timestamp)
                 if newArea:
                     # If screen is moved add newly uncovered Pokemon to the ones that were modified since last request time.
-                    d['pokemons'] = d['pokemons'] + (PokemonCurrent.get_active(swLat, swLng, neLat, neLng, oSwLat=oSwLat, oSwLng=oSwLng, oNeLat=oNeLat, oNeLng=oNeLng))
+                    if request.args.get('eids'):
+                        eids = [int(x) for x in request.args.get('eids').split(',')]
+                        d['pokemons'] = d['pokemons'] + (PokemonCurrent.get_active_by_eid(eids, swLat, swLng, neLat, neLng, oSwLat=oSwLat, oSwLng=oSwLng, oNeLat=oNeLat, oNeLng=oNeLng))
+                    else:
+                        d['pokemons'] = d['pokemons'] + (PokemonCurrent.get_active(swLat, swLng, neLat, neLng, oSwLat=oSwLat, oSwLng=oSwLng, oNeLat=oNeLat, oNeLng=oNeLng))
 
+            """ old exclusion of pokemon
             if request.args.get('eids'):
                 # Exclude id's of pokemon that are hidden.
                 eids = [int(x) for x in request.args.get('eids').split(',')]
                 d['pokemons'] = [x for x in d['pokemons'] if x['pokemon_id'] not in eids]
+            """
+
+            if request.args.get('epids'):
+                epids = [int(x) for x in request.args.get('epids').split(',')]
+                d['pokemons'] = [x for x in d['pokemons'] if x['individual_attack'] is None or
+                                 ((x['individual_attack'] +
+                                  x['individual_defense'] +
+                                  x['individual_stamina']) / 45.0 * 100 > 90 and
+                                 x['pokemon_id'] not in epids)]
 
             if request.args.get('reids'):
                 reids = [int(x) for x in request.args.get('reids').split(',')]

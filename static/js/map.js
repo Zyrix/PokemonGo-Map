@@ -3,6 +3,7 @@
 //
 
 var $selectExclude
+var $selectPerfectionExclude
 var $selectPokemonNotify
 var $selectRarityNotify
 var $textPerfectionNotify
@@ -25,6 +26,7 @@ var searchMarkerStyles
 
 var timestamp
 var excludedPokemon = []
+var excludedPerfectionPokemon = []
 var notifiedPokemon = []
 var notifiedRarity = []
 var notifiedMinPerfection = null
@@ -190,16 +192,6 @@ function initMap () { // eslint-disable-line no-unused-vars
   locationMarker = createLocationMarker()
   createMyLocationButton()
   initSidebar()
-
-  $('#scan-here').on('click', function () {
-    var loc = map.getCenter()
-    changeLocation(loc.lat(), loc.lng())
-
-    if (!$('#search-switch').checked) {
-      $('#search-switch').prop('checked', true)
-      searchControl('on')
-    }
-  })
 }
 
 function updateLocationMarker (style) {
@@ -351,7 +343,6 @@ function pokemonLabel (name, rarity, types, disappearTime, id, latitude, longitu
     <div>
       <a href='javascript:excludePokemon(${id})'>Verstecken</a>&nbsp;&nbsp
       <a href='javascript:notifyAboutPokemon(${id})'>Benachrichtigen</a>&nbsp;&nbsp
-      <a href='javascript:removePokemonMarker("${encounterId}")'>Entfernen</a>&nbsp;&nbsp
       <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='View in Maps'>Navigation</a>
     </div>`
   return contentstring
@@ -961,7 +952,8 @@ function loadRawData () {
       'oNeLat': oNeLat,
       'oNeLng': oNeLng,
       'reids': String(reincludedPokemon),
-      'eids': String(excludedPokemon)
+      'eids': String(excludedPokemon),
+      'epids': String(excludedPerfectionPokemon)
     },
     dataType: 'json',
     cache: false,
@@ -1793,6 +1785,7 @@ $(function () {
   })
 
   $selectExclude = $('#exclude-pokemon')
+  $selectPerfectionExclude = $('#exclude-perfection')
   $selectPokemonNotify = $('#notify-pokemon')
   $selectRarityNotify = $('#notify-rarity')
   $textPerfectionNotify = $('#notify-perfection')
@@ -1829,6 +1822,11 @@ $(function () {
       data: pokeList,
       templateResult: formatState
     })
+    $selectPerfectionExclude.select2({
+      placeholder: 'Pokémon wählen',
+      data: pokeList,
+      templateResult: formatState
+    })
     $selectPokemonNotify.select2({
       placeholder: 'Pokémon wählen',
       data: pokeList,
@@ -1848,6 +1846,13 @@ $(function () {
       reincludedPokemon = reincludedPokemon.concat(buffer)
       clearStaleMarkers()
       Store.set('remember_select_exclude', excludedPokemon)
+    })
+    $selectPerfectionExclude.on('change', function (e) {
+      buffer = excludedPerfectionPokemon
+      excludedPerfectionPokemon = $selectPerfectionExclude.val().map(Number)
+      buffer = buffer.filter(function (e) { return this.indexOf(e) < 0 }, excludedPerfectionPokemon)
+      clearStaleMarkers()
+      Store.set('remember_select_perfection_exclude', excludedPerfectionPokemon)
     })
     $selectPokemonNotify.on('change', function (e) {
       notifiedPokemon = $selectPokemonNotify.val().map(Number)
@@ -1871,6 +1876,7 @@ $(function () {
 
     // recall saved lists
     $selectExclude.val(Store.get('remember_select_exclude')).trigger('change')
+    $selectPerfectionExclude.val(Store.get('remember_select_perfection_exclude')).trigger('change')
     $selectPokemonNotify.val(Store.get('remember_select_notify')).trigger('change')
     $selectRarityNotify.val(Store.get('remember_select_rarity_notify')).trigger('change')
     $textPerfectionNotify.val(Store.get('remember_text_perfection_notify')).trigger('change')
