@@ -1856,7 +1856,7 @@ $(function () {
       excludedPokemon = $selectExclude.val().map(Number)
       buffer = buffer.filter(function (e) { return this.indexOf(e) < 0 }, excludedPokemon)
       reincludedPokemon = reincludedPokemon.concat(buffer)
-      updateMap()
+      clearStaleMarkers()
       Store.set('remember_select_exclude', excludedPokemon)
     })
     $selectPerfectionExclude.on('change', function (e) {
@@ -1864,7 +1864,7 @@ $(function () {
       excludedPerfectionPokemon = $selectPerfectionExclude.val().map(Number)
       buffer = buffer.filter(function (e) { return this.indexOf(e) < 0 }, excludedPerfectionPokemon)
       reincludedPerfectionPokemon = reincludedPerfectionPokemon.concat(buffer)
-      updateMap()
+      clearStaleMarkers()
       Store.set('remember_select_perfection_exclude', excludedPerfectionPokemon)
     })
     $selectPokemonNotify.on('change', function (e) {
