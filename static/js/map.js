@@ -216,7 +216,7 @@ function createLocationMarker () {
       lat: lat,
       lng: lng
     },
-    draggable: true,
+    draggable: false,
     icon: null,
     optimized: false,
     zIndex: google.maps.Marker.MAX_ZINDEX + 2
