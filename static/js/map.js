@@ -332,9 +332,9 @@ function pokemonLabel (name, rarity, types, disappearTime, id, latitude, longitu
     </div>
       ${details}
     <div>
-      <a href='javascript:excludePokemon(${id})'>Alle Weg</a>&nbsp;&nbsp
+      <a href='javascript:excludePokemon(${id})'>Ausblenden (alle)</a>&nbsp;&nbsp
       <a href='javascript:notifyAboutPokemon(${id})'>Benachrichtigen</a>&nbsp;&nbsp
-      <a href='javascript:removePokemonMarker("${encounterId}")'>Eins Weg</a>&nbsp;&nbsp
+      <a href='javascript:removePokemonMarker("${encounterId}")'>Ausblenden (1)</a>&nbsp;&nbsp
       <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='View in Maps'>Route</a>
     </div>`
   return contentstring
