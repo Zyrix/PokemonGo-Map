@@ -300,7 +300,7 @@ function getTypeSpan (type) {
 
 function openMapDirections (lat, lng) { // eslint-disable-line no-unused-vars
   var myLocation = locationMarker.getPosition()
-  var url = 'https://www.google.com/maps/dir/' + myLocation.lat() + ',' + myLocation.lng() + '/' + lat + ',' + lng
+  var url = 'https://www.google.com/maps/dir/Current+Location/' + lat + ',' + lng
   window.open(url, '_blank')
 }
 
@@ -316,10 +316,7 @@ function pokemonLabel (name, rarity, types, disappearTime, id, latitude, longitu
     var iv = (atk + def + sta) / 45 * 100
     details = `
       <div>
-        IV: ${iv.toFixed(1)}% (${atk}/${def}/${sta})
-      </div>
-      <div>
-        Moves: ${i8ln(moves[move1]['name'])} / ${i8ln(moves[move2]['name'])}
+        ${iv.toFixed(1)}% (${atk}/${def}/${sta}) - ${i8ln(moves[move1]['name'])} / ${i8ln(moves[move2]['name'])}
       </div>
       `
   }
@@ -327,25 +324,18 @@ function pokemonLabel (name, rarity, types, disappearTime, id, latitude, longitu
     <div>
       <b>${name}</b>
       <span> - </span>
-      <small>
-        <a href='http://www.pokemon.com/de/pokedex/${id}' target='_blank' title='Im Pokedex anzeigen'>#${id}</a>
-      </small>
-      <span> ${rarityDisplay}</span>
-      <span> - </span>
-      <small>${typesDisplay}</small>
+      <span class='label-countdown' disappears-at='${disappearTime}'>00m00s </span>
+      <span>(${pad(disappearDate.getHours())}:${pad(disappearDate.getMinutes())}:${pad(disappearDate.getSeconds())})</span>
     </div>
     <div>
-      Verschwindet um ${pad(disappearDate.getHours())}:${pad(disappearDate.getMinutes())}:${pad(disappearDate.getSeconds())}
-      <span class='label-countdown' disappears-at='${disappearTime}'>(00m00s)</span>
-    </div>
-    <div>
-      Koordinaten: ${latitude.toFixed(6)}, ${longitude.toFixed(7)}
+      ${latitude.toFixed(6)}, ${longitude.toFixed(7)}
     </div>
       ${details}
     <div>
-      <a href='javascript:excludePokemon(${id})'>Verstecken</a>&nbsp;&nbsp
+      <a href='javascript:excludePokemon(${id})'>Alle Weg</a>&nbsp;&nbsp
       <a href='javascript:notifyAboutPokemon(${id})'>Benachrichtigen</a>&nbsp;&nbsp
-      <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='View in Maps'>Navigation</a>
+      <a href='javascript:removePokemonMarker("${encounterId}")'>Eins Weg</a>&nbsp;&nbsp
+      <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='View in Maps'>Route</a>
     </div>`
   return contentstring
 }
@@ -1238,14 +1228,13 @@ var updateLabelDiffTime = function () {
     if (disappearsAt < now) {
       timestring = '(expired)'
     } else {
-      timestring = '('
+      timestring = ''
       if (hours > 0) {
         timestring = hours + 'h'
       }
 
       timestring += ('0' + minutes).slice(-2) + 'm'
       timestring += ('0' + seconds).slice(-2) + 's'
-      timestring += ')'
     }
 
     $(element).text(timestring)
