@@ -189,13 +189,6 @@ class Pogom(Flask):
                     else:
                         d['pokemons'] = d['pokemons'] + (PokemonCurrent.get_active(swLat, swLng, neLat, neLng, oSwLat=oSwLat, oSwLng=oSwLng, oNeLat=oNeLat, oNeLng=oNeLng))
 
-            """ old exclusion of pokemon
-            if request.args.get('eids'):
-                # Exclude id's of pokemon that are hidden.
-                eids = [int(x) for x in request.args.get('eids').split(',')]
-                d['pokemons'] = [x for x in d['pokemons'] if x['pokemon_id'] not in eids]
-            """
-
             if request.args.get('epids'):
                 epids = [int(x) for x in request.args.get('epids').split(',')]
                 d['pokemons'] = [x for x in d['pokemons'] if x['individual_attack'] is None or
