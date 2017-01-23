@@ -209,6 +209,11 @@ class Pogom(Flask):
                 d['pokemons'] = d['pokemons'] + (PokemonCurrent.get_active_by_id(reids, swLat, swLng, neLat, neLng))
                 d['reids'] = reids
 
+            if request.args.get('repids'):
+                repids = [int(x) for x in request.args.get('repids').split(',')]
+                d['pokemons'] = d['pokemons'] + (PokemonCurrent.get_active_by_id(repids, swLat, swLng, neLat, neLng))
+                d['repids'] = repids
+
         if request.args.get('pokestops', 'true') == 'true':
             if lastpokestops != 'true':
                 d['pokestops'] = Pokestop.get_stops(swLat, swLng, neLat, neLng, lured=luredonly)

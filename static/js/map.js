@@ -33,7 +33,9 @@ var notifiedMinPerfection = null
 
 var buffer = []
 var reincludedPokemon = []
+var reincludedPerfectionPokemon = []
 var reids = []
+var repids = []
 
 var map
 var rawDataIsLoading = false
@@ -833,8 +835,10 @@ function addListeners (marker) {
 
 function clearStaleMarkers () {
   $.each(mapData.pokemons, function (key, value) {
+    var perfection = 100.0 * (mapData.pokemons[key]['individual_defense'] + mapData.pokemons[key]['individual_attack'] + mapData.pokemons[key]['individual_stamina']) / 45
     if (mapData.pokemons[key]['disappear_time'] < new Date().getTime() ||
-      excludedPokemon.indexOf(mapData.pokemons[key]['pokemon_id']) >= 0) {
+      ((excludedPokemon.indexOf(mapData.pokemons[key]['pokemon_id']) >= 0) && ((isNaN(perfection)) || (perfection < 90))) ||
+      ((excludedPerfectionPokemon.indexOf(mapData.pokemons[key]['pokemon_id']) >= 0) && (perfection >= 90))) {
       if (mapData.pokemons[key].marker.rangeCircle) {
         mapData.pokemons[key].marker.rangeCircle.setMap(null)
         delete mapData.pokemons[key].marker.rangeCircle
@@ -953,6 +957,7 @@ function loadRawData () {
       'oNeLng': oNeLng,
       'reids': String(reincludedPokemon),
       'eids': String(excludedPokemon),
+      'repids': String(reincludedPerfectionPokemon),
       'epids': String(excludedPerfectionPokemon)
     },
     dataType: 'json',
@@ -975,16 +980,19 @@ function processPokemons (i, item) {
     return false // in case the checkbox was unchecked in the meantime.
   }
 
+  var perfection = 100.0 * (item['individual_attack'] + item['individual_defense'] + item['individual_stamina']) / 45
   if (!(item['encounter_id'] in mapData.pokemons) &&
-    excludedPokemon.indexOf(item['pokemon_id']) < 0 && item['disappear_time'] > Date.now()) {
-    // add marker to map and item to dict
-    if (item.marker) {
-      item.marker.setMap(null)
-    }
-    if (!item.hidden) {
-      item.marker = setupPokemonMarker(item, map)
-      customizePokemonMarker(item.marker, item)
-      mapData.pokemons[item['encounter_id']] = item
+    item['disappear_time'] > Date.now() &&
+    (((excludedPokemon.indexOf(item['pokemon_id']) < 0) && ((isNaN(perfection)) || (perfection < 90))) ||
+    ((excludedPerfectionPokemon.indexOf(item['pokemon_id']) < 0) && (perfection >= 90)))) {
+      // add marker to map and item to dict
+      if (item.marker) {
+        item.marker.setMap(null)
+      }
+      if (!item.hidden) {
+        item.marker = setupPokemonMarker(item, map)
+        customizePokemonMarker(item.marker, item)
+        mapData.pokemons[item['encounter_id']] = item
     }
   }
 }
@@ -1149,7 +1157,7 @@ function updateMap () {
     showInBoundsMarkers(mapData.pokestops, 'pokestop')
     showInBoundsMarkers(mapData.scanned, 'scanned')
     showInBoundsMarkers(mapData.spawnpoints, 'inbound')
-//    drawScanPath(result.scanned);
+//    drawScanPath(result.scanned)
     clearStaleMarkers()
 
     updateScanned()
@@ -1174,6 +1182,10 @@ function updateMap () {
     reids = result.reids
     if (reids instanceof Array) {
       reincludedPokemon = reids.filter(function (e) { return this.indexOf(e) < 0 }, reincludedPokemon)
+    }
+    repids = result.repids
+    if (repids instanceof Array) {
+      reincludedPerfectionPokemon = repids.filter(function (e) { return this.indexOf(e) < 0 }, reincludedPerfectionPokemon)
     }
     timestamp = result.timestamp
     lastUpdateTime = Date.now()
@@ -1844,14 +1856,15 @@ $(function () {
       excludedPokemon = $selectExclude.val().map(Number)
       buffer = buffer.filter(function (e) { return this.indexOf(e) < 0 }, excludedPokemon)
       reincludedPokemon = reincludedPokemon.concat(buffer)
-      clearStaleMarkers()
+      updateMap()
       Store.set('remember_select_exclude', excludedPokemon)
     })
     $selectPerfectionExclude.on('change', function (e) {
       buffer = excludedPerfectionPokemon
       excludedPerfectionPokemon = $selectPerfectionExclude.val().map(Number)
       buffer = buffer.filter(function (e) { return this.indexOf(e) < 0 }, excludedPerfectionPokemon)
-      clearStaleMarkers()
+      reincludedPerfectionPokemon = reincludedPerfectionPokemon.concat(buffer)
+      updateMap()
       Store.set('remember_select_perfection_exclude', excludedPerfectionPokemon)
     })
     $selectPokemonNotify.on('change', function (e) {

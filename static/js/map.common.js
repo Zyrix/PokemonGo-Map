@@ -874,6 +874,10 @@ var StoreOptions = {
     default: [],
     type: StoreTypes.JSON
   },
+  'remember_select_perfection_exclude': {
+    default: [],
+    type: StoreTypes.JSON
+  },
   'remember_select_notify': {
     default: [],
     type: StoreTypes.JSON
