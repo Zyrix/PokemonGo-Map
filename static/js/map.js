@@ -411,7 +411,7 @@ function gymLabel (teamName, teamId, gymPoints, latitude, longitude, lastScanned
       <div>
         <center>
           <div style='padding-bottom: 2px'>
-            Gym owned by:
+            Arena gehört:
           </div>
           <div>
             <b style='color:rgba(${gymColor[teamId]})'>Team ${teamName}</b><br>
@@ -427,10 +427,10 @@ function gymLabel (teamName, teamId, gymPoints, latitude, longitude, lastScanned
             ${memberStr}
           </div>
           <div>
-            Location: ${latitude.toFixed(6)}, ${longitude.toFixed(7)}
+            Standort: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}
           </div>
           <div>
-            Last Scanned: ${lastScannedStr}
+            Aktualisierung: ${lastScannedStr}
           </div>
           ${directionsStr}
         </center>
