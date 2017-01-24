@@ -1053,7 +1053,7 @@ function setupPokemonMarker (item, map, perfectionLimit, isBounceDisabled) {
 
   // Display Pokémon with high IV bigger
   if (iv >= perfectionLimit) {
-    iconSize *= 1.5
+    iconSize *= 2
   }
 
   var pokemonIndex = item['pokemon_id'] - 1

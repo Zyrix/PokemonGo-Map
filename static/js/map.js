@@ -333,7 +333,7 @@ function pokemonLabel (name, rarity, types, disappearTime, id, latitude, longitu
       <span>(${pad(disappearDate.getHours())}:${pad(disappearDate.getMinutes())}:${pad(disappearDate.getSeconds())})</span>
     </div>
     <div>
-      ${latitude.toFixed(6)}, ${longitude.toFixed(7)}
+      ${latitude.toFixed(4)}, ${longitude.toFixed(4)}
     </div>
       ${details}
     <div>
