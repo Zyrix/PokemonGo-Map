@@ -120,6 +120,8 @@ class Pogom(Flask):
         oNeLat = request.args.get('oNeLat')
         oNeLng = request.args.get('oNeLng')
 
+        perfectionLimit = request.args.get('perflim')
+
         # Previous switch settings.
         lastgyms = request.args.get('lastgyms')
         lastpokestops = request.args.get('lastpokestops')
@@ -194,7 +196,7 @@ class Pogom(Flask):
                 d['pokemons'] = [x for x in d['pokemons'] if x['individual_attack'] is None or
                                  ((x['individual_attack'] +
                                   x['individual_defense'] +
-                                  x['individual_stamina']) / 45.0 * 100 > 90 and
+                                  x['individual_stamina']) / 45.0 * 100 >= perfectionLimit and
                                  x['pokemon_id'] not in epids)]
 
             if request.args.get('reids'):

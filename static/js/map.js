@@ -4,6 +4,7 @@
 
 var $selectExclude
 var $selectPerfectionExclude
+var $textPerfectionLimit
 var $selectPokemonNotify
 var $selectRarityNotify
 var $textPerfectionNotify
@@ -27,6 +28,7 @@ var searchMarkerStyles
 var timestamp
 var excludedPokemon = []
 var excludedPerfectionPokemon = []
+var perfectionLimit = null
 var notifiedPokemon = []
 var notifiedRarity = []
 var notifiedMinPerfection = null
@@ -316,7 +318,10 @@ function pokemonLabel (name, rarity, types, disappearTime, id, latitude, longitu
     var iv = (atk + def + sta) / 45 * 100
     details = `
       <div>
-        ${iv.toFixed(1)}% (${atk}/${def}/${sta}) - ${i8ln(moves[move1]['name'])} / ${i8ln(moves[move2]['name'])}
+        ${iv.toFixed(1)}% (${atk}/${def}/${sta})
+      </div>
+      <div>
+        ${i8ln(moves[move1]['name'])} / ${i8ln(moves[move2]['name'])}
       </div>
       `
   }
@@ -332,9 +337,11 @@ function pokemonLabel (name, rarity, types, disappearTime, id, latitude, longitu
     </div>
       ${details}
     <div>
-      <a href='javascript:excludePokemon(${id})'>Ausblenden (alle)</a>&nbsp;&nbsp
+      <a href='javascript:excludePokemon(${id})'>Verstecken (alle)</a>&nbsp;&nbsp
+      <a href='javascript:removePokemonMarker("${encounterId}")'>Verstecken (1)</a>&nbsp;&nbsp
+    </div>
+    <div>
       <a href='javascript:notifyAboutPokemon(${id})'>Benachrichtigen</a>&nbsp;&nbsp
-      <a href='javascript:removePokemonMarker("${encounterId}")'>Ausblenden (1)</a>&nbsp;&nbsp
       <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='View in Maps'>Route</a>
     </div>`
   return contentstring
@@ -827,8 +834,8 @@ function clearStaleMarkers () {
   $.each(mapData.pokemons, function (key, value) {
     var perfection = 100.0 * (mapData.pokemons[key]['individual_defense'] + mapData.pokemons[key]['individual_attack'] + mapData.pokemons[key]['individual_stamina']) / 45
     if (mapData.pokemons[key]['disappear_time'] < new Date().getTime() ||
-      ((excludedPokemon.indexOf(mapData.pokemons[key]['pokemon_id']) >= 0) && ((isNaN(perfection)) || (perfection < 90))) ||
-      ((excludedPerfectionPokemon.indexOf(mapData.pokemons[key]['pokemon_id']) >= 0) && (perfection >= 90))) {
+      ((excludedPokemon.indexOf(mapData.pokemons[key]['pokemon_id']) >= 0) && ((isNaN(perfection)) || (perfection < perfectionLimit))) ||
+      ((excludedPerfectionPokemon.indexOf(mapData.pokemons[key]['pokemon_id']) >= 0) && (perfection >= perfectionLimit))) {
       if (mapData.pokemons[key].marker.rangeCircle) {
         mapData.pokemons[key].marker.rangeCircle.setMap(null)
         delete mapData.pokemons[key].marker.rangeCircle
@@ -948,7 +955,8 @@ function loadRawData () {
       'reids': String(reincludedPokemon),
       'eids': String(excludedPokemon),
       'repids': String(reincludedPerfectionPokemon),
-      'epids': String(excludedPerfectionPokemon)
+      'epids': String(excludedPerfectionPokemon),
+      'perflim': perfectionLimit
     },
     dataType: 'json',
     cache: false,
@@ -973,14 +981,14 @@ function processPokemons (i, item) {
   var perfection = 100.0 * (item['individual_attack'] + item['individual_defense'] + item['individual_stamina']) / 45
   if (!(item['encounter_id'] in mapData.pokemons) &&
     item['disappear_time'] > Date.now() &&
-    (((excludedPokemon.indexOf(item['pokemon_id']) < 0) && ((isNaN(perfection)) || (perfection < 90))) ||
-    ((excludedPerfectionPokemon.indexOf(item['pokemon_id']) < 0) && (perfection >= 90)))) {
+    (((excludedPokemon.indexOf(item['pokemon_id']) < 0) && ((isNaN(perfection)) || (perfection < perfectionLimit))) ||
+    ((excludedPerfectionPokemon.indexOf(item['pokemon_id']) < 0) && (perfection >= perfectionLimit)))) {
       // add marker to map and item to dict
       if (item.marker) {
         item.marker.setMap(null)
       }
       if (!item.hidden) {
-        item.marker = setupPokemonMarker(item, map)
+        item.marker = setupPokemonMarker(item, map, perfectionLimit)
         customizePokemonMarker(item.marker, item)
         mapData.pokemons[item['encounter_id']] = item
     }
@@ -1206,7 +1214,7 @@ function redrawPokemon (pokemonList) {
     var item = pokemonList[key]
     if (!item.hidden) {
       if (item.marker.rangeCircle) item.marker.rangeCircle.setMap(null)
-      var newMarker = setupPokemonMarker(item, map, this.marker.animationDisabled)
+      var newMarker = setupPokemonMarker(item, map, perfectionLimit, this.marker.animationDisabled)
       customizePokemonMarker(newMarker, item, skipNotification)
       item.marker.setMap(null)
       pokemonList[key].marker = newMarker
@@ -1787,6 +1795,7 @@ $(function () {
 
   $selectExclude = $('#exclude-pokemon')
   $selectPerfectionExclude = $('#exclude-perfection')
+  $textPerfectionLimit = $('#perfection-limit')
   $selectPokemonNotify = $('#notify-pokemon')
   $selectRarityNotify = $('#notify-rarity')
   $textPerfectionNotify = $('#notify-perfection')
@@ -1856,6 +1865,22 @@ $(function () {
       clearStaleMarkers()
       Store.set('remember_select_perfection_exclude', excludedPerfectionPokemon)
     })
+    $textPerfectionLimit.on('change', function (e) {
+      var oldPerfectionLimit = perfectionLimit
+      perfectionLimit = parseInt($textPerfectionLimit.val(), 10)
+      if (isNaN(perfectionLimit) || perfectionLimit <= 0) {
+        perfectionLimit = 90
+      }
+      if (perfectionLimit > 100) {
+        perfectionLimit = 100
+      }
+      $textPerfectionLimit.val(perfectionLimit)
+      if (perfectionLimit < oldPerfectionLimit) {
+        updateMap()
+      }
+      redrawPokemon(redrawPokemon(mapData.pokemons))
+      Store.set('remember_text_perfection_limit', perfectionLimit)
+    })
     $selectPokemonNotify.on('change', function (e) {
       notifiedPokemon = $selectPokemonNotify.val().map(Number)
       Store.set('remember_select_notify', notifiedPokemon)
@@ -1879,6 +1904,7 @@ $(function () {
     // recall saved lists
     $selectExclude.val(Store.get('remember_select_exclude')).trigger('change')
     $selectPerfectionExclude.val(Store.get('remember_select_perfection_exclude')).trigger('change')
+    $textPerfectionLimit.val(Store.get('remember_text_perfection_limit')).trigger('change')
     $selectPokemonNotify.val(Store.get('remember_select_notify')).trigger('change')
     $selectRarityNotify.val(Store.get('remember_select_rarity_notify')).trigger('change')
     $textPerfectionNotify.val(Store.get('remember_text_perfection_notify')).trigger('change')

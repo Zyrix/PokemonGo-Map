@@ -878,6 +878,10 @@ var StoreOptions = {
     default: [],
     type: StoreTypes.JSON
   },
+  'remember_text_perfection_limit': {
+    default: '90',
+    type: StoreTypes.Number
+  },
   'remember_select_notify': {
     default: [],
     type: StoreTypes.JSON
@@ -1038,7 +1042,7 @@ function getGoogleSprite (index, sprite, displayHeight) {
   }
 }
 
-function setupPokemonMarker (item, map, isBounceDisabled) {
+function setupPokemonMarker (item, map, perfectionLimit, isBounceDisabled) {
   var iv = 0
   if ('individual_attack' in item) {
     iv = (item['individual_attack'] + item['individual_defense'] + item['individual_stamina']) / 45.0 * 100
@@ -1048,8 +1052,8 @@ function setupPokemonMarker (item, map, isBounceDisabled) {
   var iconSize = 2 + (map.getZoom() - 3) * (map.getZoom() - 3) * 0.2 + Store.get('iconSizeModifier')
 
   // Display Pokémon with high IV bigger
-  if (iv > 90) {
-    iconSize += 30
+  if (iv >= perfectionLimit) {
+    iconSize *= 1.5
   }
 
   var pokemonIndex = item['pokemon_id'] - 1
