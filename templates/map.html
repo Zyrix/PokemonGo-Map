@@ -171,17 +171,7 @@
               </select>
             </div>
             <div class="form-control switch-container">
-              <h3>Scanned Locations</h3>
-              <div class="onoffswitch">
-                <input id="scanned-switch" type="checkbox" name="scanned-switch" class="onoffswitch-checkbox">
-                <label class="onoffswitch-label" for="scanned-switch">
-                <span class="switch-label" data-on="On" data-off="Off"></span>
-                <span class="switch-handle"></span>
-                </label>
-              </div>
-            </div>
-            <div class="form-control switch-container">
-              <h3>Spawn Points</h3>
+              <h3>Spawn Punkte</h3>
               <div class="onoffswitch">
                 <input id="spawnpoints-switch" type="checkbox" name="spawnpoints-switch" class="onoffswitch-checkbox">
                 <label class="onoffswitch-label" for="spawnpoints-switch">
@@ -201,12 +191,20 @@
               </div>
             </div>
             <div class="form-control switch-container">
-              <h3>Timers</h3>
+              <h3>Timer</h3>
               <div class="onoffswitch">
                 <input id="timer-switch" type="checkbox" name="timer-switch" class="onoffswitch-checkbox" checked>
                 <label class="onoffswitch-label" for="timer-switch">
                 <span class="switch-label" data-on="On" data-off="Off"></span>
                 <span class="switch-handle"></span>
+                </label>
+              </div>
+            </div>
+            <div id="timer-filter-wrapper" style="display:none">
+              <div class="form-control">
+                <label for="timer-zoom">
+                  <h3>Timer Zoom Stufe</h3>
+                  <input id="timer-zoom" type="text" name="timer-zoom" placeholder="Zoom-Stufe angeben (0 - 18)"/>
                 </label>
               </div>
             </div>
@@ -229,7 +227,7 @@
             <div class="form-control">
               <label for="perfection-limit">
                 <h3>Top-Pokémon Limit</h3>
-                <input id="perfection-limit" type="text" name="perfection-limit" placeholder="Schwellwert (Prozent) wählen"/>
+                <input id="perfection-limit" type="text" name="perfection-limit" placeholder="Schwellwert (Prozent) angeben"/>
               </label>
             </div>
           </div>

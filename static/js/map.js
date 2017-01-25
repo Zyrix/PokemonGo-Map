@@ -23,6 +23,7 @@ var $selectLocationIconMarker
 var $switchGymSidebar
 var $timeoutDialog
 var $showTimers
+var $textTimerZoom
 
 var language = document.documentElement.lang === '' ? 'en' : document.documentElement.lang
 var idToPokemon = {}
@@ -53,6 +54,7 @@ var rangeMarkers = ['pokemon', 'pokestop', 'gym']
 var storeZoom = true
 var scanPath
 var moves
+var timerZoom
 
 var oSwLat
 var oSwLng
@@ -271,6 +273,8 @@ function initSidebar () {
   $('#pokemon-switch').prop('checked', Store.get('showPokemon'))
   $('#pokestops-switch').prop('checked', Store.get('showPokestops'))
   $('#timer-switch').prop('checked', Store.get('showTimers'))
+  $('#timer-filter-wrapper').toggle(Store.get('showTimers'))
+  $('#timer-zoom').val(Store.get('hideTimersAtZoomLevel'))
   $('#lured-pokestops-only-switch').val(Store.get('showLuredPokestopsOnly'))
   $('#lured-pokestops-only-wrapper').toggle(Store.get('showPokestops'))
   $('#geoloc-switch').prop('checked', Store.get('geoLocate'))
@@ -1876,6 +1880,33 @@ $(function () {
 
   $showTimers.on('change', function () {
     Store.set('showTimers', this.checked)
+
+    var options = {
+      'duration': 500
+    }
+    var wrapper = $('#timer-filter-wrapper')
+    if (this.checked) {
+      wrapper.show(options)
+    } else {
+      wrapper.hide(options)
+    }
+
+    redrawPokemon(mapData.pokemons)
+    redrawPokemon(mapData.lurePokemons)
+  })
+
+  $textTimerZoom = $('#timer-zoom')
+
+  $textTimerZoom.on('change', function (e) {
+    timerZoom = parseInt($textTimerZoom.val(), 10)
+    if (isNaN(timerZoom) || timerZoom < 0) {
+      timerZoom = 0
+    }
+    if (timerZoom > 18) {
+      timerZoom = 18
+    }
+    $textTimerZoom.val(timerZoom)
+    Store.set('hideTimersAtZoomLevel', timerZoom)
     redrawPokemon(mapData.pokemons)
     redrawPokemon(mapData.lurePokemons)
   })
@@ -2037,7 +2068,8 @@ $(function () {
       if (perfectionLimit < oldPerfectionLimit) {
         updateMap()
       }
-      redrawPokemon(redrawPokemon(mapData.pokemons))
+      redrawPokemon(mapData.pokemons)
+      redrawPokemon(mapData.lurePokemons)
       Store.set('remember_text_perfection_limit', perfectionLimit)
     })
     $selectPokemonNotify.on('change', function (e) {
