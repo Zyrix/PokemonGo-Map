@@ -886,10 +886,6 @@ var StoreOptions = {
     default: [],
     type: StoreTypes.JSON
   },
-  'remember_select_rarity_notify': {
-    default: [], // Common, Uncommon, Rare, Very Rare, Ultra Rare
-    type: StoreTypes.JSON
-  },
   'remember_text_perfection_notify': {
     default: '',
     type: StoreTypes.Number

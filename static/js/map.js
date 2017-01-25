@@ -6,7 +6,6 @@ var $selectExclude
 var $selectPerfectionExclude
 var $textPerfectionLimit
 var $selectPokemonNotify
-var $selectRarityNotify
 var $textPerfectionNotify
 var $selectStyle
 var $selectIconResolution
@@ -38,7 +37,6 @@ var excludedPokemon = []
 var excludedPerfectionPokemon = []
 var perfectionLimit = null
 var notifiedPokemon = []
-var notifiedRarity = []
 var notifiedMinPerfection = null
 
 var buffer = []
@@ -654,7 +652,7 @@ function customizePokemonMarker (marker, item, skipNotification) {
     disableAutoPan: true
   })
 
-  if (notifiedPokemon.indexOf(item['pokemon_id']) > -1 || notifiedRarity.indexOf(item['pokemon_rarity']) > -1) {
+  if (notifiedPokemon.indexOf(item['pokemon_id']) > -1) {
     if (!skipNotification) {
       if (Store.get('playSound')) {
         audio.play()
@@ -2065,7 +2063,6 @@ $(function () {
   $selectPerfectionExclude = $('#exclude-perfection')
   $textPerfectionLimit = $('#perfection-limit')
   $selectPokemonNotify = $('#notify-pokemon')
-  $selectRarityNotify = $('#notify-rarity')
   $textPerfectionNotify = $('#notify-perfection')
   var numberOfPokemon = 151
 
@@ -2110,11 +2107,6 @@ $(function () {
       data: pokeList,
       templateResult: formatState
     })
-    $selectRarityNotify.select2({
-      placeholder: 'Seltenheit wählen',
-      data: [i8ln('Common'), i8ln('Uncommon'), i8ln('Rare'), i8ln('Very Rare'), i8ln('Ultra Rare')],
-      templateResult: formatRarity
-    })
 
     // setup list change behavior now that we have the list to work from
     $selectExclude.on('change', function (e) {
@@ -2154,10 +2146,6 @@ $(function () {
       notifiedPokemon = $selectPokemonNotify.val().map(Number)
       Store.set('remember_select_notify', notifiedPokemon)
     })
-    $selectRarityNotify.on('change', function (e) {
-      notifiedRarity = $selectRarityNotify.val().map(String)
-      Store.set('remember_select_rarity_notify', notifiedRarity)
-    })
     $textPerfectionNotify.on('change', function (e) {
       notifiedMinPerfection = parseInt($textPerfectionNotify.val(), 10)
       if (isNaN(notifiedMinPerfection) || notifiedMinPerfection <= 0) {
@@ -2175,7 +2163,6 @@ $(function () {
     $selectPerfectionExclude.val(Store.get('remember_select_perfection_exclude')).trigger('change')
     $textPerfectionLimit.val(Store.get('remember_text_perfection_limit')).trigger('change')
     $selectPokemonNotify.val(Store.get('remember_select_notify')).trigger('change')
-    $selectRarityNotify.val(Store.get('remember_select_rarity_notify')).trigger('change')
     $textPerfectionNotify.val(Store.get('remember_text_perfection_notify')).trigger('change')
 
     if (isTouchDevice() && isMobileDevice()) {
