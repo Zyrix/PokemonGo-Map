@@ -355,12 +355,12 @@ function pokemonLabel (name, rarity, types, disappearTime, id, latitude, longitu
     </div>
       ${details}
     <div>
-      <a href='javascript:excludePokemon(${id})'>Verstecken (alle)</a>&nbsp;&nbsp
-      <a href='javascript:removePokemonMarker("${encounterId}")'>Verstecken (1)</a>&nbsp;&nbsp
+      <a href='javascript:excludePokemon(${id})'>Ausblenden (∞)</a>&nbsp;&nbsp
+      <a href='javascript:removePokemonMarker("${encounterId}")'>Ausblenden (1)</a>&nbsp;&nbsp
     </div>
     <div>
       <a href='javascript:notifyAboutPokemon(${id})'>Benachrichtigen</a>&nbsp;&nbsp
-      <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='View in Maps'>Route</a>
+      <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='Auf Karte anzeigen'>Route</a>
     </div>`
   return contentstring
 }
@@ -385,7 +385,7 @@ function gymLabel (teamName, teamId, gymPoints, latitude, longitude, lastScanned
   var directionsStr = ''
   if (!Store.get('useGymSidebar')) {
     directionsStr = `<div>
-        <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='Auf Karte anzeigen'>Navigation</a>
+        <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='Auf Karte anzeigen'>Route</a>
       </div>`
   }
 
@@ -403,10 +403,10 @@ function gymLabel (teamName, teamId, gymPoints, latitude, longitude, lastScanned
           </div>
           ${nameStr}
           <div>
-            Location: ${latitude.toFixed(6)}, ${longitude.toFixed(7)}
+            Standort: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}
           </div>
           <div>
-            Last Scanned: ${lastScannedStr}
+            Aktualisierung: ${lastScannedStr}
           </div>
           ${directionsStr}
         </center>
@@ -462,17 +462,17 @@ function pokestopLabel (expireTime, latitude, longitude) {
 
     str = `
       <div>
-        <b>Lured Pokéstop</b>
+        <b>Pokéstop mit Lockmodul</b>
       </div>
       <div>
-        Lure expires at ${pad(expireDate.getHours())}:${pad(expireDate.getMinutes())}:${pad(expireDate.getSeconds())}
+        Lockmodul läuft aus um ${pad(expireDate.getHours())}:${pad(expireDate.getMinutes())}:${pad(expireDate.getSeconds())}
         (<span class='label-countdown' disappears-at='${expireTime}'>00:00</span>)
       </div>
       <div>
-        Location: ${latitude.toFixed(6)}, ${longitude.toFixed(7)}
+        Standort: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}
       </div>
       <div>
-        <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='Auf Karte anzeigen'>Get directions</a>
+        <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='Auf Karte anzeigen'>Route</a>
       </div>`
   } else {
     str = `
@@ -480,10 +480,10 @@ function pokestopLabel (expireTime, latitude, longitude) {
         <b>Pokéstop</b>
       </div>
       <div>
-        Location: ${latitude.toFixed(6)}, ${longitude.toFixed(7)}
+        Standort: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}
       </div>
       <div>
-        <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='Auf Karte anzeigen'>Get directions</a>
+        <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='Auf Karte anzeigen'>Route</a>
       </div>`
   }
 
@@ -1388,7 +1388,7 @@ function createMyLocationButton () {
   locationButton.style.cursor = 'pointer'
   locationButton.style.marginRight = '10px'
   locationButton.style.padding = '0px'
-  locationButton.title = 'My Location'
+  locationButton.title = 'Mein Standort'
   locationContainer.appendChild(locationButton)
 
   var locationIcon = document.createElement('div')
@@ -1578,7 +1578,7 @@ function showGymDetails (id) { // eslint-disable-line no-unused-vars
           Last Scanned: ${lastScannedDate.getFullYear()}-${pad(lastScannedDate.getMonth() + 1)}-${pad(lastScannedDate.getDate())} ${pad(lastScannedDate.getHours())}:${pad(lastScannedDate.getMinutes())}:${pad(lastScannedDate.getSeconds())}
         </div>
         <div>
-          <a href='javascript:void(0);' onclick='javascript:openMapDirections(${result.latitude},${result.longitude});' title='View in Maps'>Get directions</a>
+          <a href='javascript:void(0);' onclick='javascript:openMapDirections(${result.latitude},${result.longitude});' title='Auf Karte anzeigen'>Route</a>
         </div>
       </center>
     `
