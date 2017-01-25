@@ -261,6 +261,8 @@ function updateSearchStatus () {
 }
 
 function initSidebar () {
+  $('#pokemon-switch').prop('checked', Store.get('showPokemon'))
+  $('#pokemon-filter-wrapper').toggle(Store.get('showPokemon'))
   $('#gyms-switch').prop('checked', Store.get('showGyms'))
   $('#gym-sidebar-switch').prop('checked', Store.get('useGymSidebar'))
   $('#gym-sidebar-wrapper').toggle(Store.get('showGyms'))
@@ -270,7 +272,6 @@ function initSidebar () {
   $('#min-level-gyms-filter-switch').val(Store.get('minGymLevel'))
   $('#max-level-gyms-filter-switch').val(Store.get('maxGymLevel'))
   $('#last-update-gyms-switch').val(Store.get('showLastUpdatedGymsOnly'))
-  $('#pokemon-switch').prop('checked', Store.get('showPokemon'))
   $('#pokestops-switch').prop('checked', Store.get('showPokestops'))
   $('#timer-switch').prop('checked', Store.get('showTimers'))
   $('#timer-filter-wrapper').toggle(Store.get('showTimers'))
@@ -462,10 +463,10 @@ function pokestopLabel (expireTime, latitude, longitude) {
 
     str = `
       <div>
-        <b>Pokéstop mit Lockmodul</b>
+        <b>Pokéstop (mit Lockmodul)</b>
       </div>
       <div>
-        Lockmodul läuft aus um ${pad(expireDate.getHours())}:${pad(expireDate.getMinutes())}:${pad(expireDate.getSeconds())}
+        Lockmodul bis ${pad(expireDate.getHours())}:${pad(expireDate.getMinutes())}:${pad(expireDate.getSeconds())}
         (<span class='label-countdown' disappears-at='${expireTime}'>00:00</span>)
       </div>
       <div>
@@ -2153,6 +2154,19 @@ $(function () {
   }
 
   // Setup UI element interactions
+  $('#pokemon-switch').change(function () {
+    var options = {
+      'duration': 500
+    }
+    var wrapper = $('#pokemon-filter-wrapper')
+    if (this.checked) {
+      wrapper.show(options)
+    } else {
+      wrapper.hide(options)
+    }
+
+    buildSwitchChangeListener(mapData, ['pokemons'], 'showPokemon').bind(this)()
+  })
   $('#gyms-switch').change(function () {
     var options = {
       'duration': 500
@@ -2174,9 +2188,6 @@ $(function () {
       wrapper2.hide(options)
     }
     buildSwitchChangeListener(mapData, ['gyms'], 'showGyms').bind(this)()
-  })
-  $('#pokemon-switch').change(function () {
-    buildSwitchChangeListener(mapData, ['pokemons'], 'showPokemon').bind(this)()
   })
   $('#scanned-switch').change(function () {
     buildSwitchChangeListener(mapData, ['scanned'], 'showScanned').bind(this)()
