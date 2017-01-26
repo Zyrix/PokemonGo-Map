@@ -1413,7 +1413,7 @@ var updateLabelDiffTime = function () {
     var timestring = ''
 
     if (disappearsAt.ttime < disappearsAt.now) {
-      timestring = 'expired'
+      timestring = 'weg'
     } else {
       if (hours > 0) {
         timestring = hours + ':'
