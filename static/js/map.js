@@ -339,7 +339,7 @@ function getTypeSpan (type) {
 
 function openMapDirections (lat, lng) { // eslint-disable-line no-unused-vars
   var myLocation = locationMarker.getPosition()
-  var url = 'https://www.google.com/maps/dir/Current+Location/' + lat + ',' + lng
+  var url = 'https://www.google.com/maps/place/' + lat + ',' + lng
   window.open(url, '_blank')
 }
 
@@ -379,7 +379,7 @@ function pokemonLabel (name, rarity, types, disappearTime, id, latitude, longitu
     </div>
     <div>
       <a href='javascript:notifyAboutPokemon(${id})'>Benachrichtigen</a>&nbsp;&nbsp
-      <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='Auf Karte anzeigen'>Route</a>
+      <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='Auf Karte anzeigen'>Navigation</a>
     </div>`
   return contentstring
 }
@@ -404,7 +404,7 @@ function gymLabel (teamName, teamId, gymPoints, latitude, longitude, lastScanned
   var directionsStr = ''
   if (!Store.get('useGymSidebar')) {
     directionsStr = `<div>
-        <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='Auf Karte anzeigen'>Route</a>
+        <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='Auf Karte anzeigen'>Navigation</a>
       </div>`
   }
 
@@ -491,7 +491,7 @@ function pokestopLabel (expireTime, latitude, longitude) {
         Standort: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}
       </div>
       <div>
-        <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='Auf Karte anzeigen'>Route</a>
+        <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='Auf Karte anzeigen'>Navigation</a>
       </div>`
   } else {
     str = `
@@ -502,7 +502,7 @@ function pokestopLabel (expireTime, latitude, longitude) {
         Standort: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}
       </div>
       <div>
-        <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='Auf Karte anzeigen'>Route</a>
+        <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='Auf Karte anzeigen'>Navigation</a>
       </div>`
   }
 
@@ -1658,7 +1658,7 @@ function showGymDetails (id) { // eslint-disable-line no-unused-vars
           Last Scanned: ${lastScannedDate.getFullYear()}-${pad(lastScannedDate.getMonth() + 1)}-${pad(lastScannedDate.getDate())} ${pad(lastScannedDate.getHours())}:${pad(lastScannedDate.getMinutes())}:${pad(lastScannedDate.getSeconds())}
         </div>
         <div>
-          <a href='javascript:void(0);' onclick='javascript:openMapDirections(${result.latitude},${result.longitude});' title='Auf Karte anzeigen'>Route</a>
+          <a href='javascript:void(0);' onclick='javascript:openMapDirections(${result.latitude},${result.longitude});' title='Auf Karte anzeigen'>Navigation</a>
         </div>
       </center>
     `
