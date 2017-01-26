@@ -26,7 +26,7 @@ from pogom.search import search_overseer_thread
 from pogom.models import init_database, create_tables, drop_tables, Pokemon, db_updater, clean_db_loop
 from pogom.webhook import wh_updater
 
-from pogom.proxy import check_proxies
+from pogom.proxy import check_proxies, proxies_refresher
 
 # Currently supported pgoapi.
 pgoapi_version = "1.1.7"
@@ -215,7 +215,7 @@ def main():
     # Thread(s) to process database updates.
     for i in range(int(args.db_threads)):
         log.debug('Starting db-updater worker thread %d', i)
-        t = Thread(target=db_updater, name='db-updater-{}'.format(i), args=(args, db_updates_queue))
+        t = Thread(target=db_updater, name='db-updater-{}'.format(i), args=(args, db_updates_queue, db))
         t.daemon = True
         t.start()
 

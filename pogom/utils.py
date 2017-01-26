@@ -4,11 +4,13 @@
 import sys
 import configargparse
 import os
+import math
 import json
 import logging
 import shutil
 import pprint
 import time
+from s2sphere import CellId, LatLng
 
 from . import config
 
@@ -45,8 +47,6 @@ def get_args():
     # Pre-check to see if the -cf or --config flag is used on the command line.
     # If not, we'll use the env var or default value. This prevents layering of
     # config files, and handles missing config.ini as well.
-    #defaultconfigfiles = []
-    #if '-cf' not in sys.argv and '--config' not in sys.argv:
     defaultconfigfiles = [os.getenv('POGOMAP_CONFIG', os.path.join(os.path.dirname(__file__), '../config/config.ini'))]
     parser = configargparse.ConfigFileParser()
     with open('config/config.ini') as file:
@@ -73,9 +73,44 @@ def now():
     return int(time.time())
 
 
-# Gets the current time past the hour.
+# gets the time past the hour
 def cur_sec():
     return (60 * time.gmtime().tm_min) + time.gmtime().tm_sec
+
+
+# gets the total seconds past the hour for a given date
+def date_secs(d):
+    return d.minute * 60 + d.second
+
+
+# checks to see if test is between start and end assuming roll over like a clock
+def clock_between(start, test, end):
+    return (start <= test <= end and start < end) or (not (end <= test <= start) and start > end)
+
+
+# return amount of seconds between two times on the clock
+def secs_between(time1, time2):
+    return min((time1 - time2) % 3600, (time2 - time1) % 3600)
+
+
+# Return the s2sphere cellid token from a location
+def cellid(loc):
+    return CellId.from_lat_lng(LatLng.from_degrees(loc[0], loc[1])).to_token()
+
+
+# Return equirectangular approximation distance in km
+def equi_rect_distance(loc1, loc2):
+    R = 6371  # radius of the earth in km
+    lat1 = math.radians(loc1[0])
+    lat2 = math.radians(loc2[0])
+    x = (math.radians(loc2[1]) - math.radians(loc1[1])) * math.cos(0.5 * (lat2 + lat1))
+    y = lat2 - lat1
+    return R * math.sqrt(x * x + y * y)
+
+
+# Return True if distance between two locs is less than distance in km
+def in_radius(loc1, loc2, distance):
+    return equi_rect_distance(loc1, loc2) < distance
 
 
 def i8ln(word):

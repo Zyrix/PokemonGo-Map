@@ -12,23 +12,23 @@ navBtn.onclick = function () {
   } else if ('geolocation' in navigator) {
     // Getting the GPS position can be very slow on some devices
     navBtn.disabled = true
-    navBtn.innerText = 'Locating...'
+    navBtn.innerText = 'Orten...'
 
     // Get location and use it!
     navigator.geolocation.getCurrentPosition(function (p) {
-      navBtn.innerText = 'Reloading...'
+      navBtn.innerText = 'Laden...'
       location.href = 'mobile?lat=' + p.coords.latitude + '&lon=' + p.coords.longitude
     }, function (err) {
       navBtn.innerText = 'Reload'
       navBtn.disabled = false
-      alert('Failed to get location: ' + err.message)
+      alert('Fehler bei der Standortbestimmung: ' + err.message)
     }, {
       enableHighAccuracy: true,
       timeout: 5000,
       maximumAge: 5000
     })
   } else {
-    alert('Your device does not support web geolocation')
+    alert('Dein Gerät unterstützt keine Web-Standortermittlung')
   }
 }
 
