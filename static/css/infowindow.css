@@ -1,0 +1,6 @@
+.gm-style .gm-style-iw div {
+   padding-bottom: 5px;
+}
+.gm-style .gm-style-iw :last-child {
+   padding-bottom: 0px;
+}
