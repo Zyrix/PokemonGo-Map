@@ -1081,7 +1081,7 @@ function setupPokemonMarker (item, map, perfectionLimit, isBounceDisabled) {
   }
 
   var pokemonIndex = item['pokemon_id'] - 1
-  var sprite = pokemonSprites[Store.get('pokemonIcons')] || pokemonSprites['highres']
+  var sprite = pokemonSprites['normal']
   var icon = getGoogleSprite(pokemonIndex, sprite, iconSize)
   var hideTimersAtZoomLevel = Store.get('hideTimersAtZoomLevel')
   var showTimers = Store.get('showTimers')
