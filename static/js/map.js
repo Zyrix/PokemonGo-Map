@@ -80,7 +80,7 @@ var audio = new Audio('static/sounds/ding.mp3')
   <prc> - iv in percent without percent symbol
   <atk> - attack as number
   <def> - defense as number
-  <sta> - stamnia as number
+  <sta> - stamina as number
 */
 var notifyIvTitle = '<pkm> <prc>% (<atk>/<def>/<sta>)'
 var notifyNoIvTitle = '<pkm>'
@@ -89,8 +89,10 @@ var notifyNoIvTitle = '<pkm>'
   text place holders:
   <dist>  - disappear time
   <udist> - time until disappear
+  <move1> - move 1
+  <move2> - move 2
 */
-var notifyText = 'verschwindet um <dist> (<udist>)'
+var notifyText = '<move1> / <move2> \nverschwindet um <dist> (<udist>)'
 
 //
 // Functions
@@ -617,6 +619,8 @@ function getTimeUntil(time) {
 
 function getNotifyText(item) {
     var iv = getIv(item['individual_attack'], item['individual_defense'], item['individual_stamina'])
+    var move_1 = i8ln(moves[item['move_1']]['name'])
+    var move_2 = i8ln(moves[item['move_2']]['name'])
     var find = ['<prc>', '<pkm>', '<atk>', '<def>', '<sta>']
     var replace = [((iv) ? iv.toFixed(1) : ''), item['pokemon_name'], item['individual_attack'],
         item['individual_defense'], item['individual_stamina']]
@@ -627,8 +631,8 @@ function getNotifyText(item) {
     var until = getTimeUntil(item['disappear_time'])
     var udist = (until.hour > 0) ? until.hour + ':' : ''
     udist += lpad(until.min, 2, 0) + 'm' + lpad(until.sec, 2, 0) + 's'
-    find = ['<dist>', '<udist>']
-    replace = [dist, udist]
+    find = ['<dist>', '<udist>', '<move1>', '<move2>']
+    replace = [dist, udist, move_1, move_2]
     var ntext = repArray(notifyText, find, replace)
 
     return {
