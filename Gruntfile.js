@@ -12,6 +12,7 @@ module.exports = function(grunt) {
           'static/dist/css/app.built.css': 'static/sass/main.scss',
           'static/dist/css/mobile.built.css': 'static/sass/mobile.scss',
           'static/dist/css/statistics.built.css': 'static/css/statistics.css',
+          'static/dist/css/infowindow.built.css': 'static/css/infowindow.css',
           'static/dist/css/status.built.css': 'static/sass/status.scss'
         }
       }
@@ -29,6 +30,7 @@ module.exports = function(grunt) {
           'static/dist/js/app.built.js': 'static/js/app.js',
           'static/dist/js/map.built.js': 'static/js/map.js',
           'static/dist/js/map.common.built.js': 'static/js/map.common.js',
+          'static/dist/js/label.built.js': 'static/js/label.js',
           'static/dist/js/mobile.built.js': 'static/js/mobile.js',
           'static/dist/js/stats.built.js': 'static/js/stats.js',
           'static/dist/js/statistics.built.js': 'static/js/statistics.js',
@@ -49,6 +51,7 @@ module.exports = function(grunt) {
           'static/dist/js/app.min.js': 'static/dist/js/app.built.js',
           'static/dist/js/map.min.js': 'static/dist/js/map.built.js',
           'static/dist/js/map.common.min.js': 'static/dist/js/map.common.built.js',
+          'static/dist/js/label.min.js': 'static/dist/js/label.built.js',
           'static/dist/js/mobile.min.js': 'static/dist/js/mobile.built.js',
           'static/dist/js/stats.min.js': 'static/dist/js/stats.built.js',
           'static/dist/js/statistics.min.js': 'static/dist/js/statistics.built.js',
@@ -109,6 +112,7 @@ module.exports = function(grunt) {
           'static/dist/css/app.min.css': 'static/dist/css/app.built.css',
           'static/dist/css/mobile.min.css': 'static/dist/css/mobile.built.css',
           'static/dist/css/statistics.min.css': 'static/dist/css/statistics.built.css',
+          'static/dist/css/infowindow.min.css': 'static/dist/css/infowindow.built.css',
           'static/dist/css/status.min.css': 'static/dist/css/status.built.css'
         }
       }

@@ -874,12 +874,16 @@ var StoreOptions = {
     default: [],
     type: StoreTypes.JSON
   },
-  'remember_select_notify': {
+  'remember_select_perfection_exclude': {
     default: [],
     type: StoreTypes.JSON
   },
-  'remember_select_rarity_notify': {
-    default: [], // Common, Uncommon, Rare, Very Rare, Ultra Rare
+  'remember_text_perfection_limit': {
+    default: '90',
+    type: StoreTypes.Number
+  },
+  'remember_select_notify': {
+    default: [],
     type: StoreTypes.JSON
   },
   'remember_text_perfection_notify': {
@@ -893,6 +897,26 @@ var StoreOptions = {
   'useGymSidebar': {
     default: false,
     type: StoreTypes.Boolean
+  },
+  'showOpenGymsOnly': {
+    default: 0,
+    type: StoreTypes.Number
+  },
+  'showTeamGymsOnly': {
+    default: 0,
+    type: StoreTypes.Number
+  },
+  'showLastUpdatedGymsOnly': {
+    default: 0,
+    type: StoreTypes.Number
+  },
+  'minGymLevel': {
+    default: 0,
+    type: StoreTypes.Number
+  },
+  'maxGymLevel': {
+    default: 10,
+    type: StoreTypes.Number
   },
   'showPokemon': {
     default: true,
@@ -956,6 +980,14 @@ var StoreOptions = {
   },
   'iconSizeModifier': {
     default: 0,
+    type: StoreTypes.Number
+  },
+  'showTimers': {
+    default: true,
+    type: StoreTypes.Boolean
+  },
+  'hideTimersAtZoomLevel': {
+    default: 18,
     type: StoreTypes.Number
   },
   'searchMarkerStyle': {
@@ -1049,7 +1081,7 @@ function setupPokemonMarker (item, map, perfectionLimit, isBounceDisabled) {
   }
 
   var pokemonIndex = item['pokemon_id'] - 1
-  var sprite = pokemonSprites['normal']
+  var sprite = pokemonSprites['highres']
   var icon = getGoogleSprite(pokemonIndex, sprite, iconSize)
   var hideTimersAtZoomLevel = Store.get('hideTimersAtZoomLevel')
   var showTimers = Store.get('showTimers')

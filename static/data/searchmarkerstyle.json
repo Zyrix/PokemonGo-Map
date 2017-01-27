@@ -1,34 +1,34 @@
 {
   "none": {
-    "name": "Hidden",
+    "name": "Versteckt",
     "icon": "static/marker_icons/transparent.png"
   },
   "google": {
-    "name": "Default Google Marker",
+    "name": "Standart Google Marker",
     "icon": null
   },
   "red": {
-    "name": "Red",
+    "name": "Rot",
     "icon": "static/marker_icons/red.gif"
   },
   "red_animated": {
-    "name": "Red (Animated)",
+    "name": "Rot (Animiert)",
     "icon": "static/marker_icons/red_animated.gif"
   },
   "blue": {
-    "name": "Blue",
+    "name": "Blau",
     "icon": "static/marker_icons/blue.gif"
   },
   "blue_animated": {
-    "name": "Blue (Animated)",
+    "name": "Blau (Animiert)",
     "icon": "static/marker_icons/blue_animated.gif"
   },
   "yellow": {
-    "name": "Yellow",
+    "name": "Gelb",
     "icon": "static/marker_icons/yellow.gif"
   },
   "yellow_animated": {
-    "name": "Yellow (Animated)",
+    "name": "Gelb (Animiert)",
     "icon": "static/marker_icons/yellow_animated.gif"
   },
   "pokesition": {
