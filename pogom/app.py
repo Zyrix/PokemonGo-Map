@@ -173,21 +173,21 @@ class Pogom(Flask):
                 # If this is first request since switch on, load all pokemon on screen.
                 if request.args.get('eids'):
                     eids = [int(x) for x in request.args.get('eids').split(',')]
-                    d['pokemons'] = PokemonCurrent.get_active_by_eid(eids, swLat, swLng, neLat, neLng)
+                    d['pokemons'] = PokemonCurrent.get_active_by_eid(eids, perfectionLimit, swLat, swLng, neLat, neLng)
                 else:
                     d['pokemons'] = PokemonCurrent.get_active(swLat, swLng, neLat, neLng)
             else:
                 # If map is already populated only request modified Pokemon since last request time.
                 if request.args.get('eids'):
                     eids = [int(x) for x in request.args.get('eids').split(',')]
-                    d['pokemons'] = PokemonCurrent.get_active_by_eid(eids, swLat, swLng, neLat, neLng, timestamp=timestamp)
+                    d['pokemons'] = PokemonCurrent.get_active_by_eid(eids, perfectionLimit, swLat, swLng, neLat, neLng, timestamp=timestamp)
                 else:
                     d['pokemons'] = PokemonCurrent.get_active(swLat, swLng, neLat, neLng, timestamp=timestamp)
                 if newArea:
                     # If screen is moved add newly uncovered Pokemon to the ones that were modified since last request time.
                     if request.args.get('eids'):
                         eids = [int(x) for x in request.args.get('eids').split(',')]
-                        d['pokemons'] = d['pokemons'] + (PokemonCurrent.get_active_by_eid(eids, swLat, swLng, neLat, neLng, oSwLat=oSwLat, oSwLng=oSwLng, oNeLat=oNeLat, oNeLng=oNeLng))
+                        d['pokemons'] = d['pokemons'] + (PokemonCurrent.get_active_by_eid(eids, perfectionLimit, swLat, swLng, neLat, neLng, oSwLat=oSwLat, oSwLng=oSwLng, oNeLat=oNeLat, oNeLng=oNeLng))
                     else:
                         d['pokemons'] = d['pokemons'] + (PokemonCurrent.get_active(swLat, swLng, neLat, neLng, oSwLat=oSwLat, oSwLng=oSwLng, oNeLat=oNeLat, oNeLng=oNeLng))
 

@@ -162,7 +162,7 @@ class PokemonCurrent(BaseModel):
         return pokemons
 
     @staticmethod
-    def get_active_by_eid(eids, swLat, swLng, neLat, neLng, timestamp=0, oSwLat=None, oSwLng=None, oNeLat=None, oNeLng=None):
+    def get_active_by_eid(eids, perfLimit, swLat, swLng, neLat, neLng, timestamp=0, oSwLat=None, oSwLng=None, oNeLat=None, oNeLng=None):
         now_date = datetime.utcnow()
         # now_secs = date_secs(now_date)
         query = PokemonCurrent.select()
@@ -173,7 +173,7 @@ class PokemonCurrent(BaseModel):
                             (~(PokemonCurrent.pokemon_id << eids) |
                              ((PokemonCurrent.individual_attack +
                               PokemonCurrent.individual_defense +
-                              PokemonCurrent.individual_stamina) / 45.0 * 100 > 90)))
+                              PokemonCurrent.individual_stamina) / 45.0 * 100 >= perfLimit)))
                      .dicts())
         elif timestamp > 0:
             # If timestamp is known only load modified pokemon.
@@ -187,7 +187,7 @@ class PokemonCurrent(BaseModel):
                             (~(PokemonCurrent.pokemon_id << eids) |
                              ((PokemonCurrent.individual_attack +
                               PokemonCurrent.individual_defense +
-                              PokemonCurrent.individual_stamina) / 45.0 * 100 > 90)))
+                              PokemonCurrent.individual_stamina) / 45.0 * 100 >= perfLimit)))
                      .dicts())
         elif oSwLat and oSwLng and oNeLat and oNeLng:
             # Send Pokemon in view but exclude those within old boundaries. Only send newly uncovered Pokemon.
@@ -205,7 +205,7 @@ class PokemonCurrent(BaseModel):
                             (~(PokemonCurrent.pokemon_id << eids) |
                              ((PokemonCurrent.individual_attack +
                               PokemonCurrent.individual_defense +
-                              PokemonCurrent.individual_stamina) / 45.0 * 100 > 90)))
+                              PokemonCurrent.individual_stamina) / 45.0 * 100 >= perfLimit)))
                      .dicts())
         else:
             query = (PokemonCurrent
@@ -219,7 +219,7 @@ class PokemonCurrent(BaseModel):
                             (~(PokemonCurrent.pokemon_id << eids) |
                              ((PokemonCurrent.individual_attack +
                               PokemonCurrent.individual_defense +
-                              PokemonCurrent.individual_stamina) / 45.0 * 100 > 90)))
+                              PokemonCurrent.individual_stamina) / 45.0 * 100 >= perfLimit)))
                      .dicts())
 
         # Performance: Disable the garbage collector prior to creating a (potentially) large dict with append().
