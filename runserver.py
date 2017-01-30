@@ -193,6 +193,12 @@ def main():
 
     app = Pogom(__name__)
     db = init_database(app)
+    if args.clear_db:
+        log.info('Clearing database')
+        if args.db_type == 'mysql':
+            drop_tables(db)
+        elif os.path.isfile(args.db):
+            os.remove(args.db)
     create_tables(db)
 
     app.set_current_location(position)
@@ -213,7 +219,7 @@ def main():
     db_updates_queue = Queue()
 
     # Thread(s) to process database updates.
-    for i in range(int(args.db_threads)):
+    for i in range(args.db_threads):
         log.debug('Starting db-updater worker thread %d', i)
         t = Thread(target=db_updater, name='db-updater-{}'.format(i), args=(args, db_updates_queue, db))
         t.daemon = True
@@ -229,11 +235,41 @@ def main():
     wh_updates_queue = Queue()
 
     # Thread to process webhook updates.
-    for i in range(int(args.wh_threads)):
+    for i in range(args.wh_threads):
         log.debug('Starting wh-updater worker thread %d', i)
         t = Thread(target=wh_updater, name='wh-updater-{}'.format(i), args=(args, wh_updates_queue))
         t.daemon = True
         t.start()
+
+    if not args.only_server:
+
+        # Processing proxies if set (load from file, check and overwrite old args.proxy with new working list)
+        args.proxy = check_proxies(args)
+
+        # Run periodical proxy refresh thread
+        if (args.proxy_file is not None) and (args.proxy_refresh > 0):
+            t = Thread(target=proxies_refresher, name='proxy-refresh', args=(args,))
+            t.daemon = True
+            t.start()
+        else:
+            log.info('Periodical proxies refresh disabled.')
+
+        # Gather the Pokemon!
+
+        # Attempt to dump the spawn points (do this before starting threads of endure the woe).
+        if args.spawnpoint_scanning and args.spawnpoint_scanning != 'nofile' and args.dump_spawnpoints:
+            with open(args.spawnpoint_scanning, 'w+') as file:
+                log.info('Saving spawn points to %s', args.spawnpoint_scanning)
+                spawns = Pokemon.get_spawnpoints_in_hex(position, args.step_limit)
+                file.write(json.dumps(spawns))
+                log.info('Finished exporting spawn points')
+
+        argset = (args, new_location_queue, pause_bit, heartbeat, db_updates_queue, wh_updates_queue)
+
+        log.debug('Starting a %s search thread', args.scheduler)
+        search_thread = Thread(target=search_overseer_thread, name='search-overseer', args=argset)
+        search_thread.daemon = True
+        search_thread.start()
 
     if args.cors:
         CORS(app)
@@ -248,16 +284,21 @@ def main():
     config['ROOT_PATH'] = app.root_path
     config['GMAPS_KEY'] = args.gmaps_key
 
-    ssl_context = None
-    if args.ssl_certificate and args.ssl_privatekey \
-            and os.path.exists(args.ssl_certificate) and os.path.exists(args.ssl_privatekey):
-        ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
-        ssl_context.load_cert_chain(args.ssl_certificate, args.ssl_privatekey)
-        log.info('Web server in SSL mode.')
-    if args.verbose or args.very_verbose:
-        app.run(threaded=True, use_reloader=False, debug=True, host=args.host, port=args.port, ssl_context=ssl_context)
+    if args.no_server:
+        # This loop allows for ctrl-c interupts to work since flask won't be holding the program open.
+        while search_thread.is_alive():
+            time.sleep(60)
     else:
-        app.run(threaded=True, use_reloader=False, debug=False, host=args.host, port=args.port, ssl_context=ssl_context)
+        ssl_context = None
+        if args.ssl_certificate and args.ssl_privatekey \
+                and os.path.exists(args.ssl_certificate) and os.path.exists(args.ssl_privatekey):
+            ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
+            ssl_context.load_cert_chain(args.ssl_certificate, args.ssl_privatekey)
+            log.info('Web server in SSL mode.')
+        if args.verbose or args.very_verbose:
+            app.run(threaded=True, use_reloader=False, debug=True, host=args.host, port=args.port, ssl_context=ssl_context)
+        else:
+            app.run(threaded=True, use_reloader=False, debug=False, host=args.host, port=args.port, ssl_context=ssl_context)
 
 
 if __name__ == '__main__':

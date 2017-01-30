@@ -29,6 +29,7 @@
     <!-- retina iPhone 6 iOS 7 -->
     <link rel="apple-touch-icon" href="{{ url_for('static', filename='appicons/180x180.png').lstrip('/') }}" sizes="180x180">
     <link rel="stylesheet" href="{{ url_for('static', filename='dist/css/app.min.css').lstrip('/') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='dist/css/infowindow.min.css').lstrip('/') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.0/jquery-ui.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.12/css/jquery.dataTables.css">
     <script src="{{ url_for('static', filename='js/vendor/modernizr.custom.js').lstrip('/') }}"></script>
@@ -53,7 +54,7 @@
             float: right;
           }
         </style>
-        <a href="#nav"><span class="label">Options</span></a>
+        <a href="#nav"><span class="label">Optionen</span></a>
         <h1><a href="#">Pokémon Go Map</a></h1>
         <a href="#stats" id="statsToggle" class="statsNav" style="float: right;"><span class="label">Stats</span></a>
       </header>
