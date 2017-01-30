@@ -2040,7 +2040,7 @@ $(function () {
       return state.text
     }
     var $state = $(
-      '<span><i class="pokemon-sprite n' + state.element.value.toString() + '"></i> ' + state.text + '</span>'
+      '<span>' + state.text + '</span>'
     )
     return $state
   }
