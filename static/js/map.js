@@ -92,8 +92,8 @@ var notifyNoIvTitle = '<pkm>'
   <move1> - move 1
   <move2> - move 2
 */
-var notifyMoveText = '<move1> / <move2> \nverschwindet um <dist> (<udist>)'
-var notifyNoMoveText = 'verschwindet um <dist> (<udist>)'
+var notifyMoveText = '<move1> / <move2> \n<udist> (<dist>)'
+var notifyNoMoveText = '<udist> (<dist>)'
 
 //
 // Functions
