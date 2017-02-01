@@ -92,7 +92,8 @@ var notifyNoIvTitle = '<pkm>'
   <move1> - move 1
   <move2> - move 2
 */
-var notifyText = '<move1> / <move2> \nverschwindet um <dist> (<udist>)'
+var notifyMoveText = '<move1> / <move2> \nverschwindet um <dist> (<udist>)'
+var notifyNoMoveText = 'verschwindet um <dist> (<udist>)'
 
 //
 // Functions
@@ -619,8 +620,10 @@ function getTimeUntil(time) {
 
 function getNotifyText(item) {
     var iv = getIv(item['individual_attack'], item['individual_defense'], item['individual_stamina'])
-    var move_1 = i8ln(moves[item['move_1']]['name'])
-    var move_2 = i8ln(moves[item['move_2']]['name'])
+    if (moves[item['move_1']]) {
+        var move_1 = i8ln(moves[item['move_1']]['name'])
+        var move_2 = i8ln(moves[item['move_2']]['name'])
+    }
     var find = ['<prc>', '<pkm>', '<atk>', '<def>', '<sta>']
     var replace = [((iv) ? iv.toFixed(1) : ''), item['pokemon_name'], item['individual_attack'],
         item['individual_defense'], item['individual_stamina']]
@@ -633,7 +636,7 @@ function getNotifyText(item) {
     udist += lpad(until.min, 2, 0) + 'm' + lpad(until.sec, 2, 0) + 's'
     find = ['<dist>', '<udist>', '<move1>', '<move2>']
     replace = [dist, udist, move_1, move_2]
-    var ntext = repArray(notifyText, find, replace)
+    var ntext = repArray(((move_1) ? notifyMoveText : notifyNoMoveText), find, replace)
 
     return {
         'fav_title': ntitle,
