@@ -367,7 +367,7 @@ function pokemonLabel (name, rarity, types, disappearTime, id, latitude, longitu
     <div>
       <b>${name}</b>
       <span> - </span>
-      <span class='label-countdown' disappears-at='${disappearTime}'>00m00s </span>
+      <span class='label-countdown-old' disappears-at='${disappearTime}'>00m00s </span>
       <span>(${pad(disappearDate.getHours())}:${pad(disappearDate.getMinutes())}:${pad(disappearDate.getSeconds())})</span>
     </div>
     <div>
@@ -486,7 +486,7 @@ function pokestopLabel (expireTime, latitude, longitude) {
       </div>
       <div>
         Lockmodul bis ${pad(expireDate.getHours())}:${pad(expireDate.getMinutes())}:${pad(expireDate.getSeconds())}
-        (<span class='label-countdown' disappears-at='${expireTime}'>00:00</span>)
+        (<span class='label-countdown-old' disappears-at='${expireTime}'>00:00</span>)
       </div>
       <div>
         Standort: ${latitude.toFixed(4)}, ${longitude.toFixed(4)}
@@ -1416,7 +1416,7 @@ var updateLabelDiffTime = function () {
     var timestring = ''
 
     if (disappearsAt.ttime < disappearsAt.now) {
-      timestring = 'weg'
+      timestring = '00:00'
     } else {
       if (hours > 0) {
         timestring = hours + ':'
@@ -1424,6 +1424,27 @@ var updateLabelDiffTime = function () {
 
       timestring += lpad(minutes, 2, 0) + ':'
       timestring += lpad(seconds, 2, 0)
+    }
+
+    $(element).text(timestring)
+  })
+  $('.label-countdown-old').each(function (index, element) {
+    var disappearsAt = getTimeUntil(parseInt(element.getAttribute('disappears-at')))
+
+    var hours = disappearsAt.hour
+    var minutes = disappearsAt.min
+    var seconds = disappearsAt.sec
+    var timestring = ''
+
+    if (disappearsAt.ttime < disappearsAt.now) {
+      timestring = '00m00s'
+    } else {
+      if (hours > 0) {
+        timestring = hours + 'h'
+      }
+
+      timestring += lpad(minutes, 2, 0) + 'm'
+      timestring += lpad(seconds, 2, 0) + 's'
     }
 
     $(element).text(timestring)
