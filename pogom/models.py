@@ -93,7 +93,6 @@ class Pokemon(BaseModel):
     move_1 = IntegerField(null=True)
     move_2 = IntegerField(null=True)
     last_modified = DateTimeField(null=True, index=True, default=datetime.utcnow)
-    time_detail = IntegerField(index=True)  # -1 when unknown disappear_time, 0 when predicted, 1 when returned by server
 
     class Meta:
         indexes = ((('latitude', 'longitude'), False),)
@@ -367,43 +366,9 @@ class Pokemon(BaseModel):
         return (disappear_time + 1800) % 3600
 
     @classmethod
-    def clean_timers_data(cls):
-        query = Pokemon.update(time_detail=-1).where(Pokemon.time_detail == 1)
-        query.execute()
-
-    @classmethod
-    def predict_disappear_time(cls, spawnpoint_id):
-        now = datetime.utcnow()
-        predicted = -1
-
-        query = (Pokemon
-                 .select(Pokemon.disappear_time)
-                 .where((Pokemon.spawnpoint_id == spawnpoint_id) &
-                        (Pokemon.time_detail == 1))
-                 .order_by(Pokemon.last_modified.desc())
-                 .limit(1)).dicts()
-
-        temp = list(query)
-
-        log.debug("Found %d entrie(s) in db as to predict disappear_time" % (len(temp)))
-
-        if len(temp) > 0:
-            disappear_time = temp[0]['disappear_time']
-
-            predicted = now.replace(minute=disappear_time.minute, second=disappear_time.second)
-
-            if now > predicted:
-                predicted = predicted + timedelta(hours=1)
-
-            log.debug("Predicted datetime %s " % (predicted.strftime("%Y-%m-%d %H:%M:%S")))
-        return predicted
-
-    @classmethod
     def get_spawnpoints(cls, swLat, swLng, neLat, neLng, timestamp=0, oSwLat=None, oSwLng=None, oNeLat=None, oNeLng=None):
-        subquery = Pokemon.select(Pokemon.spawnpoint_id.alias('spawn_id'), fn.Max(Pokemon.time_detail).alias('td')).group_by(Pokemon.spawnpoint_id).alias("derived")
-        query = Pokemon.select(Pokemon.latitude, Pokemon.longitude, Pokemon.spawnpoint_id, Pokemon.disappear_time, Pokemon.last_modified, subquery.c.td.alias('time_detail'), ((Pokemon.disappear_time.minute * 60) + Pokemon.disappear_time.second).alias('time'), fn.Count(Pokemon.spawnpoint_id).alias('count'))
+        query = Pokemon.select(Pokemon.latitude, Pokemon.longitude, Pokemon.spawnpoint_id, (date_secs(Pokemon.disappear_time)).alias('time'), fn.Count(Pokemon.spawnpoint_id).alias('count'))
 
-        query = query.join(subquery, on=(subquery.c.spawn_id == Pokemon.spawnpoint_id))
         if timestamp > 0:
             query = (query
                      .where(((Pokemon.last_modified > datetime.utcfromtimestamp(timestamp / 1000))) &
@@ -422,8 +387,7 @@ class Pokemon(BaseModel):
                             ~((Pokemon.latitude >= oSwLat) &
                               (Pokemon.longitude >= oSwLng) &
                               (Pokemon.latitude <= oNeLat) &
-                              (Pokemon.longitude <= oNeLng)
-                              ))
+                              (Pokemon.longitude <= oNeLng)))
                      .dicts())
         elif swLat and swLng and neLat and neLng:
             query = (query
@@ -433,7 +397,8 @@ class Pokemon(BaseModel):
                             (Pokemon.longitude <= neLng)
                             ))
 
-        query = query.group_by(Pokemon.latitude, Pokemon.longitude, Pokemon.spawnpoint_id)
+        query = query.group_by(Pokemon.latitude, Pokemon.longitude, Pokemon.spawnpoint_id, SQL('time'))
+
         queryDict = query.dicts()
         spawnpoints = {}
 
@@ -444,8 +409,7 @@ class Pokemon(BaseModel):
 
             if key not in spawnpoints:
                 spawnpoints[key] = sp
-
-            if (sp['disappear_time'] - sp['last_modified']) > timedelta(minutes=30):
+            else:
                 spawnpoints[key]['special'] = True
 
             if 'time' not in spawnpoints[key] or count >= spawnpoints[key]['count']:
@@ -469,15 +433,16 @@ class Pokemon(BaseModel):
                          (date_secs(Pokemon.disappear_time)).alias('time'),
                          Pokemon.spawnpoint_id
                          ))
-        subquery = Pokemon.select(Pokemon.spawnpoint_id.alias('spawn_id'), fn.Max(Pokemon.time_detail).alias('td')).group_by(Pokemon.spawnpoint_id).alias("derived")
-        query = query.join(subquery, on=(subquery.c.spawn_id == Pokemon.spawnpoint_id))
-
         query = (query.where((Pokemon.latitude <= n) &
                              (Pokemon.latitude >= s) &
                              (Pokemon.longitude >= w) &
                              (Pokemon.longitude <= e)
                              ))
-        query = query.group_by(Pokemon.spawnpoint_id)
+        # Sqlite doesn't support distinct on columns.
+        if args.db_type == 'mysql':
+            query = query.distinct(Pokemon.spawnpoint_id)
+        else:
+            query = query.group_by(Pokemon.spawnpoint_id)
 
         s = list(query.dicts())
 
@@ -1542,40 +1507,6 @@ def hex_bounds(center, steps=None, radius=None):
     return (n, e, s, w)
 
 
-def construct_pokemon_dict(pokemons, p, encounter_result, d_t, time_detail=-1):
-    pokemons[p['encounter_id']] = {
-        'encounter_id': b64encode(str(p['encounter_id'])),
-        'spawnpoint_id': p['spawn_point_id'],
-        'pokemon_id': p['pokemon_data']['pokemon_id'],
-        'latitude': p['latitude'],
-        'longitude': p['longitude'],
-        'disappear_time': d_t,
-        'time_detail': time_detail
-    }
-    if encounter_result is not None and 'wild_pokemon' in encounter_result['responses']['ENCOUNTER']:
-        pokemon_info = encounter_result['responses']['ENCOUNTER']['wild_pokemon']['pokemon_data']
-        attack = pokemon_info.get('individual_attack', 0)
-        defense = pokemon_info.get('individual_defense', 0)
-        stamina = pokemon_info.get('individual_stamina', 0)
-        pokemons[p['encounter_id']].update({
-            'individual_attack': attack,
-            'individual_defense': defense,
-            'individual_stamina': stamina,
-            'move_1': pokemon_info['move_1'],
-            'move_2': pokemon_info['move_2'],
-        })
-    else:
-        if encounter_result is not None and 'wild_pokemon' not in encounter_result['responses']['ENCOUNTER']:
-            log.warning("Error encountering {}, status code: {}".format(p['encounter_id'], encounter_result['responses']['ENCOUNTER']['status']))
-        pokemons[p['encounter_id']].update({
-            'individual_attack': None,
-            'individual_defense': None,
-            'individual_stamina': None,
-            'move_1': None,
-            'move_2': None,
-        })
-
-
 
 def db_updater(args, q, db):
     # The forever loop.
@@ -1631,7 +1562,7 @@ def clean_db_loop(args):
                 query = (Pokemon
                          .delete()
                          .where((Pokemon.disappear_time <
-                                (datetime.utcnow() - timedelta(hours=args.purge_data))) & ~(Pokemon.time_detail == 1)))
+                                (datetime.utcnow() - timedelta(hours=args.purge_data)))))
                 query.execute()
 
             log.info('Regular database cleaning complete')

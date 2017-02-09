@@ -105,7 +105,6 @@ class Pogom(Flask):
         if request.args.get('timestamp'):
             timestamp = int(request.args.get('timestamp'))
             timestamp -= 1000  # Overlap, for rounding errors.
-            timestamp -= 60000 # make sure to get all Pokemon since last update.
         else:
             timestamp = 0
 

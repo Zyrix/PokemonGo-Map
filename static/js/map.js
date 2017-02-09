@@ -521,13 +521,13 @@ function spawnpointLabel (item) {
       <b>Spawn Point</b>
     </div>
     <div>
-      Every hour from ${formatSpawnTime(item.time)} to ${formatSpawnTime(item.time + 900)}
+      Jede Stunde von ${formatSpawnTime(item.time)} bis ${formatSpawnTime(item.time + 1800)}
     </div>`
 
   if (item.special) {
     str += `
       <div>
-        May appear as early as ${formatSpawnTime(item.time - 1800)}
+        Kann auch schon um ${formatSpawnTime(item.time - 900)} <br>oder erst um ${formatSpawnTime(item.time + 900)} auftauchen
       </div>`
   }
   return str
@@ -1603,8 +1603,7 @@ function createUpdateWorker () {
       var updateBlob = new Blob([`onmessage = function(e) {
         var data = e.data
         if (data.name === 'backgroundUpdate') {
-          // 5000 -> 20000
-          self.setInterval(function () {self.postMessage({name: 'backgroundUpdate'})}, 20000)
+          self.setInterval(function () {self.postMessage({name: 'backgroundUpdate'})}, 5000)
         }
       }`])
 
@@ -1614,8 +1613,8 @@ function createUpdateWorker () {
 
       updateWorker.onmessage = function (e) {
         var data = e.data
-        // 2500 -> 10000
-        if (document.hidden && data.name === 'backgroundUpdate' && Date.now() - lastUpdateTime > 10000) {
+        // 2500 -> 5000
+        if (document.hidden && data.name === 'backgroundUpdate' && Date.now() - lastUpdateTime > 5000) {
           updateMap()
           updateGeoLocation()
         }
@@ -2156,7 +2155,7 @@ $(function () {
     $textPerfectionLimit.on('change', function (e) {
       var oldPerfectionLimit = perfectionLimit
       perfectionLimit = parseInt($textPerfectionLimit.val(), 10)
-      if (isNaN(perfectionLimit) || perfectionLimit <= 0) {
+      if (isNaN(perfectionLimit) || perfectionLimit < 0) {
         perfectionLimit = 90
       }
       if (perfectionLimit > 100) {
@@ -2164,8 +2163,9 @@ $(function () {
       }
       $textPerfectionLimit.val(perfectionLimit)
       if (perfectionLimit < oldPerfectionLimit) {
-        updateMap()
+        lastpokemon = false
       }
+      updateMap()
       redrawPokemon(mapData.pokemons)
       redrawPokemon(mapData.lurePokemons)
       Store.set('remember_text_perfection_limit', perfectionLimit)
@@ -2202,7 +2202,7 @@ $(function () {
 
   // run interval timers to regularly update map and timediffs
   window.setInterval(updateLabelDiffTime, 1000)
-  window.setInterval(updateMap, 20000) // 5000 -> 20000
+  window.setInterval(updateMap, 5000)
   window.setInterval(updateGeoLocation, 5000)
 
   createUpdateWorker()
@@ -2212,7 +2212,7 @@ $(function () {
     return function () {
       Store.set(storageKey, this.checked)
       if (this.checked) {
-        // When switch is turned on we asume it has been off, makes sure we dont end up in limbo
+        // When switch is turned on we assume it has been off, makes sure we dont end up in limbo
         // Without this there could've been a situation where no markers are on map and only newly modified ones are loaded
         if (storageKey === 'showPokemon') {
           lastpokemon = false
