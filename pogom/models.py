@@ -483,7 +483,7 @@ class Pokemon(BaseModel):
 
     @classmethod
     def get_spawn_time(cls, disappear_time):
-        return (disappear_time + 2700) % 3600
+        return (disappear_time + 1800) % 3600
 
     @classmethod
     def get_spawnpoints(cls, swLat, swLng, neLat, neLng, timestamp=0, oSwLat=None, oSwLng=None, oNeLat=None, oNeLng=None):
