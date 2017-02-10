@@ -482,7 +482,7 @@ function pokestopLabel (expireTime, latitude, longitude) {
 
     str = `
       <div>
-        <b>Pokéstop (mit Lockmodul)</b>
+        <b>Pokéstop (aktiv)</b>
       </div>
       <div>
         Lockmodul bis ${pad(expireDate.getHours())}:${pad(expireDate.getMinutes())}:${pad(expireDate.getSeconds())}
@@ -518,16 +518,16 @@ function formatSpawnTime (seconds) {
 function spawnpointLabel (item) {
   var str = `
     <div>
-      <b>Spawn Point</b>
+      <b>Spawn Punkt</b>
     </div>
     <div>
-      Jede Stunde von ${formatSpawnTime(item.time)} bis ${formatSpawnTime(item.time + 1800)}
+      ${formatSpawnTime(item.time)} bis ${formatSpawnTime(item.time + 1800)}
     </div>`
 
   if (item.special) {
     str += `
       <div>
-        Kann auch schon um ${formatSpawnTime(item.time - 900)} <br>oder erst um ${formatSpawnTime(item.time + 900)} auftauchen
+        Mögliche Spawnzeiten: <br>${formatSpawnTime(item.time - 900)} oder ${formatSpawnTime(item.time + 900)}
       </div>`
   }
   return str

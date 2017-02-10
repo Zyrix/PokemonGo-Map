@@ -133,7 +133,7 @@ function processSeen (seen) {
 
   for (i = seen.pokemon.length - 1; i >= 0; i--) {
     var item = seen.pokemon[i]
-    var percentage = (item['count'] / total * 100).toFixed(4)
+    var percentage = (item['count'] / total * 100).toFixed(2)
     var lastSeen = new Date(item['disappear_time'])
     lastSeen = lastSeen.getHours() + ':' +
     ('0' + lastSeen.getMinutes()).slice(-2) + ':' +
@@ -141,7 +141,7 @@ function processSeen (seen) {
     lastSeen.getDate() + ' ' +
     monthArray[lastSeen.getMonth()] + ' ' +
     lastSeen.getFullYear()
-    var location = (item['latitude'] * 1).toFixed(7) + ', ' + (item['longitude'] * 1).toFixed(7)
+    var location = (item['latitude'] * 1).toFixed(4) + ', ' + (item['longitude'] * 1).toFixed(4)
     if (!$('#seen_' + item['pokemon_id']).length) {
       addElement(item['pokemon_id'], item['pokemon_name'])
     }
@@ -166,7 +166,7 @@ function processSeen (seen) {
 
 function updateStatMap (firstRun) {
   var duration = document.getElementById('duration')
-  var header = 'Pokémon gesehen (' + duration.options[duration.selectedIndex].text + ')'
+  var header = 'Sichtungen (' + duration.options[duration.selectedIndex].text + ')'
   if ($('#seen_header').html() !== header) {
     $('#seen_container').hide()
     $('#loading').show()
@@ -458,10 +458,10 @@ function appearanceTab (item) {
                 <a href="javascript:closeTimes();">Schließen</a>
             </div>
             <div class="row1">
-                <strong>Lat:</strong> ${item['latitude'].toFixed(7)}
+                <strong>Lat:</strong> ${item['latitude'].toFixed(4)}
             </div>
             <div class="row0">
-                <strong>Long:</strong> ${item['longitude'].toFixed(7)}
+                <strong>Long:</strong> ${item['longitude'].toFixed(4)}
             </div>
             <div class="row1">
               <strong>Anzahl:</strong> ${item['count'].toLocaleString()}
