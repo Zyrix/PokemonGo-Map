@@ -791,8 +791,8 @@ var pGoStyleNight = [{
 var pokemonSprites = {
   normal: {
     columns: 12,
-    iconWidth: 57,
-    iconHeight: 57,
+    iconWidth: 30,
+    iconHeight: 30,
     spriteWidth: 360,
     spriteHeight: 390,
     filename: 'static/icons-sprite.png',
