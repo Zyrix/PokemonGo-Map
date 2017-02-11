@@ -2,11 +2,12 @@
   display: inline-block;
   background-image: url(../../../icons-sprite.png);
   background-repeat: no-repeat;
-  top: 6px;
   position: relative;
   -moz-transform-origin: 0 0;
   height: 57px;
   width: 57px;
+  transform: scale(0.53) translateX(-3px) translateY(-3px);
+  transform-origin: left top;
 
   @for $i from 1 through 151 {
     &.n#{$i} {

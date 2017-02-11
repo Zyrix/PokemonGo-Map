@@ -68,7 +68,8 @@ table td{
 
 .container .item .image{
     float: left;
-    width: 40px;
+    height: 32px;
+    width: 32px;
     text-align: center;
 }
 
