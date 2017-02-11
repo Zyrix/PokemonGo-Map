@@ -5,8 +5,8 @@
   top: 6px;
   position: relative;
   -moz-transform-origin: 0 0;
-  height: 30px;
-  width: 30px;
+  height: 57px;
+  width: 57px;
 
   @for $i from 1 through 151 {
     &.n#{$i} {

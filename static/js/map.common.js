@@ -791,8 +791,8 @@ var pGoStyleNight = [{
 var pokemonSprites = {
   normal: {
     columns: 12,
-    iconWidth: 30,
-    iconHeight: 30,
+    iconWidth: 57,
+    iconHeight: 57,
     spriteWidth: 360,
     spriteHeight: 390,
     filename: 'static/icons-sprite.png',
@@ -975,7 +975,7 @@ var StoreOptions = {
     type: StoreTypes.Boolean
   },
   'pokemonIcons': {
-    default: 'highres',
+    default: 'normal',
     type: StoreTypes.String
   },
   'iconSizeModifier': {
