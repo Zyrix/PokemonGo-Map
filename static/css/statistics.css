@@ -46,7 +46,7 @@ table td{
 }
 
 .container{
-    overflow: auto;
+    overflow: hidden;
     line-height: 20px;
     font-size: 15px;
     margin-left: 10px;
@@ -61,7 +61,7 @@ table td{
     background: #f8f8f8;
     margin: 0px 5px 5px 0px;
     padding: 5px;
-    overflow: auto;
+    overflow: hidden;
     height: 130px;
     min-width: 260px;
 }
@@ -74,8 +74,8 @@ table td{
 }
 
 .container .item .name{
-    height: 36px;
-    line-height: 30px;
+    height: 32px;
+    line-height: 32px;
 }
 
 .container .item .name a{
