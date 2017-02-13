@@ -1600,8 +1600,7 @@ function createUpdateWorker () {
 
       updateWorker.onmessage = function (e) {
         var data = e.data
-        // 2500 -> 5000
-        if (document.hidden && data.name === 'backgroundUpdate' && Date.now() - lastUpdateTime > 5000) {
+        if (document.hidden && data.name === 'backgroundUpdate' && Date.now() - lastUpdateTime > 2500) {
           updateMap()
           updateGeoLocation()
         }
@@ -2184,8 +2183,6 @@ $(function () {
       $('.select2-search input').prop('readonly', true)
     }
   })
-
-  window.setTimeout(updateMap, 1000) // added
 
   // run interval timers to regularly update map and timediffs
   window.setInterval(updateLabelDiffTime, 1000)
