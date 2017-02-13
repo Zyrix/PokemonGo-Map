@@ -1600,8 +1600,8 @@ function createUpdateWorker () {
 
       updateWorker.onmessage = function (e) {
         var data = e.data
-        // 2500 -> 10000
-        if (document.hidden && data.name === 'backgroundUpdate' && Date.now() - lastUpdateTime > 10000) {
+        // 2500 -> 5000
+        if (document.hidden && data.name === 'backgroundUpdate' && Date.now() - lastUpdateTime > 5000) {
           updateMap()
           updateGeoLocation()
         }
