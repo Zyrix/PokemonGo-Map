@@ -2139,7 +2139,7 @@ $(function () {
       Store.set('remember_select_perfection_exclude', excludedPerfectionPokemon)
     })
     $textPerfectionLimit.on('change', function (e) {
-      var oldPerfectionLimit = perfectionLimit
+      var oldPerfectionLimit = perfectionLimit || 0
       perfectionLimit = parseInt($textPerfectionLimit.val(), 10)
       if (isNaN(perfectionLimit) || perfectionLimit < 0) {
         perfectionLimit = 90
@@ -2151,7 +2151,9 @@ $(function () {
       if (perfectionLimit < oldPerfectionLimit) {
         lastpokemon = false
       }
-      updateMap()
+      if (oldPerfectionLimit != 0) {
+        updateMap()
+      }
       redrawPokemon(mapData.pokemons)
       redrawPokemon(mapData.lurePokemons)
       Store.set('remember_text_perfection_limit', perfectionLimit)
