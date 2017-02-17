@@ -3,7 +3,7 @@ var monthArray = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep'
 
 /* Main stats page */
 var rawDataIsLoading = false
-var totalPokemon = 151
+var totalPokemon = 251
 var msPerMinute = 60000
 var spawnTimeMinutes = 15
 var spawnTimeMs = msPerMinute * spawnTimeMinutes
