@@ -333,20 +333,17 @@ function openMapDirections (lat, lng) { // eslint-disable-line no-unused-vars
 
 function pokemonLabel (name, rarity, types, disappearTime, id, latitude, longitude, encounterId, atk, def, sta, move1, move2) {
   var disappearDate = new Date(disappearTime)
-  var rarityDisplay = rarity ? '(' + rarity + ')' : ''
-  var typesDisplay = ''
-  $.each(types, function (index, type) {
-    typesDisplay += getTypeSpan(type)
-  })
+  //var rarityDisplay = rarity ? '(' + rarity + ')' : ''
+  //var typesDisplay = ''
+  //$.each(types, function (index, type) {
+    //typesDisplay += getTypeSpan(type)
+  //})
   var details = ''
-  if (atk != null) {
+  if (atk != null && id < 151) {
     var iv = (atk + def + sta) / 45 * 100
     details = `
       <div>
         ${iv.toFixed(1)}% (${atk}/${def}/${sta})
-      </div>
-      <div>
-        ${i8ln(moves[move1]['name'])} / ${i8ln(moves[move2]['name'])}
       </div>
       `
   }
@@ -651,7 +648,7 @@ function customizePokemonMarker (marker, item, skipNotification) {
       if (Store.get('playSound')) {
         audio.play()
       }
-      sendNotification(getNotifyText(item).fav_title, getNotifyText(item).fav_text, 'static/icons/' + item['pokemon_id'] + '.png', item['latitude'], item['longitude'])
+      //sendNotification(getNotifyText(item).fav_title, getNotifyText(item).fav_text, 'static/icons/' + item['pokemon_id'] + '.png', item['latitude'], item['longitude'])
     }
     if (marker.animationDisabled !== true) {
       marker.setAnimation(google.maps.Animation.BOUNCE)
@@ -2077,7 +2074,7 @@ $(function () {
   $textPerfectionLimit = $('#perfection-limit')
   $selectPokemonNotify = $('#notify-pokemon')
   $textPerfectionNotify = $('#notify-perfection')
-  var numberOfPokemon = 151
+  var numberOfPokemon = 251
 
   // Load pokemon names and populate lists
   $.getJSON('static/dist/data/pokemon.min.json').done(function (data) {

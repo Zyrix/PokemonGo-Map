@@ -798,6 +798,15 @@ var pokemonSprites = {
     filename: 'static/icons-sprite.png',
     name: 'Normal'
   },
+  gen2: {
+    columns: 25,
+    iconWidth: 80,
+    iconHeight: 80,
+    spriteWidth: 2000,
+    spriteHeight: 1600,
+    filename: 'static/icons-sprite-new.png',
+    name: 'gen2'
+  },
   highres: {
     columns: 7,
     iconWidth: 65,
@@ -1081,7 +1090,7 @@ function setupPokemonMarker (item, map, perfectionLimit, isBounceDisabled) {
   }
 
   var pokemonIndex = item['pokemon_id'] - 1
-  var sprite = pokemonSprites['normal']
+  var sprite = pokemonSprites['gen2']
   var icon = getGoogleSprite(pokemonIndex, sprite, iconSize)
   var hideTimersAtZoomLevel = Store.get('hideTimersAtZoomLevel')
   var showTimers = Store.get('showTimers')
