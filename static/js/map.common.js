@@ -1057,7 +1057,7 @@ var mapData = {
 
 function getGoogleSprite (index, sprite, displayHeight) {
   displayHeight = Math.max(displayHeight, 3)
-  var scale = displayHeight / sprite.iconHeight
+  var scale = displayHeight / sprite.iconHeight * 1.5
   // Crop icon just a tiny bit to avoid bleedover from neighbor
   var scaledIconSize = new google.maps.Size(scale * sprite.iconWidth - 1, scale * sprite.iconHeight - 1)
   var scaledIconOffset = new google.maps.Point(
