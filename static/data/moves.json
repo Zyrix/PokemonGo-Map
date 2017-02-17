@@ -1054,5 +1054,161 @@
 		"duration": 3200,
 		"energy": 20,
 		"dps": 4.68
+	},
+	"243": {
+		"name": "Konter",
+		"type": "Fighting"
+	},
+	"244": {
+		"name": "Pulverschnee",
+		"type": "Ice"
+	},
+	"245": {
+		"name": "Nahkampf",
+		"type": "Fighting"
+	},
+	"246": {
+		"name": "Wuchtschlag",
+		"type": "Fighting"
+	},
+	"247": {
+		"name": "Fokusstoß",
+		"type": "Fighting"
+	},
+	"248": {
+		"name": "Aurorastrahl",
+		"type": "Ice"
+	},
+	"249": {
+		"name": "Ladestrahl",
+		"type": "Electric"
+	},
+	"250": {
+		"name": "Voltwechsel",
+		"type": "Electric"
+	},
+	"251": {
+		"name": "Stromstoß",
+		"type": "Electric"
+	},
+	"252": {
+		"name": "Blitzkanone",
+		"type": "Electric"
+	},
+	"253": {
+		"name": "Drachenrute",
+		"type": "Dragon"
+	},
+	"254": {
+		"name": "Lawine",
+		"type": "Ice"
+	},
+	"255": {
+		"name": "Luftschnitt",
+		"type": "Flying"
+	},
+	"256": {
+		"name": "Sturzflug",
+		"type": "Flying"
+	},
+	"257": {
+		"name": "Himmelsfeger",
+		"type": "Flying"
+	},
+	"258": {
+		"name": "Sandgrab",
+		"type": "Ground"
+	},
+	"259": {
+		"name": "Felswurf",
+		"type": "Rock"
+	},
+	"260": {
+		"name": "Plage",
+		"type": "Bug"
+	},
+	"261": {
+		"name": "Verzweifler",
+		"type": "Normal"
+	},
+	"262": {
+		"name": "Silberhauch",
+		"type": "Bug"
+	},
+	"263": {
+		"name": "Erstauner",
+		"type": "Ghost"
+	},
+	"264": {
+		"name": "Bürde",
+		"type": "Ghost"
+	},
+	"265": {
+		"name": "Nachtnebel",
+		"type": "Ghost"
+	},
+	"266": {
+		"name": "Eisenschweif",
+		"type": "Steel"
+	},
+	"267": {
+		"name": "Gyroball",
+		"type": "Steel"
+	},
+	"268": {
+		"name": "Rammboss",
+		"type": "Steel"
+	},
+	"269": {
+		"name": "Feuerwirbel",
+		"type": "Fire"
+	},
+	"270": {
+		"name": "Hitzekoller",
+		"type": "Fire"
+	},
+	"271": {
+		"name": "Kugelsaat",
+		"type": "Grass"
+	},
+	"272": {
+		"name": "Strauchler",
+		"type": "Grass"
+	},
+	"273": {
+		"name": "Energieball",
+		"type": "Grass"
+	},
+	"274": {
+		"name": "Sondersensor",
+		"type": "Psychic"
+	},
+	"275": {
+		"name": "Seher",
+		"type": "Psychic"
+	},
+	"276": {
+		"name": "Spiegelcape",
+		"type": "Psychic"
+	},
+	"277": {
+		"name": "Wutanfall",
+		"type": "Dragon"
+	},
+	"278": {
+		"name": "Standpauke",
+		"type": "Dark"
+	},
+	"279": {
+		"name": "Knirscher",
+		"type": "Dark"
+	},
+	"280": {
+		"name": "Schmarotzer",
+		"type": "Dark"
+	},
+	"281": {
+		"name": "Kraftreserve",
+		"type": "Normaö"
 	}
 }
