@@ -457,12 +457,33 @@ class Pokestop(BaseModel):
         # Performance: Disable the garbage collector prior to creating a (potentially) large dict with append().
         gc.disable()
 
-        pokestops = []
+        pokestops = {}
+        pokestop_ids = []
+
         for p in query:
+            p['name'] = None
+            p['description'] = None
+            p['url'] = None
             if args.china:
                 p['latitude'], p['longitude'] = \
                     transform_from_wgs_to_gcj(p['latitude'], p['longitude'])
-            pokestops.append(p)
+            pokestops[p['pokestop_id']] = p
+            pokestop_ids.append(p['pokestop_id'])
+
+        if len(pokestop_ids) > 0 and args.pokestop_info:
+            details = (PokestopDetails
+                       .select(
+                           PokestopDetails.pokestop_id,
+                           PokestopDetails.description,
+                           PokestopDetails.url,
+                           PokestopDetails.name)
+                       .where(PokestopDetails.pokestop_id << pokestop_ids)
+                       .dicts())
+
+            for d in details:
+                pokestops[d['pokestop_id']]['name'] = d['name']
+                pokestops[d['pokestop_id']]['description'] = d['description']
+                pokestops[d['pokestop_id']]['url'] = d['url']
 
         # Re-enable the GC.
         gc.enable()
@@ -535,6 +556,8 @@ class Gym(BaseModel):
         gym_ids = []
         for g in results:
             g['name'] = None
+            g['description'] = None
+            g['url'] = None
             g['pokemon'] = []
             gyms[g['gym_id']] = g
             gym_ids.append(g['gym_id'])
@@ -562,12 +585,16 @@ class Gym(BaseModel):
             details = (GymDetails
                        .select(
                            GymDetails.gym_id,
-                           GymDetails.name)
+                           GymDetails.name,
+                           GymDetails.description,
+                           GymDetails.url)
                        .where(GymDetails.gym_id << gym_ids)
                        .dicts())
 
             for d in details:
                 gyms[d['gym_id']]['name'] = d['name']
+                gyms[d['gym_id']]['description'] = d['description']
+                gyms[d['gym_id']]['url'] = d['url']
 
         # Re-enable the GC.
         gc.enable()
