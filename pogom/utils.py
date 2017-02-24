@@ -208,6 +208,8 @@ def get_args():
                         help='Set the status page password.')
     parser.add_argument('-el', '--encrypt-lib', help='Path to encrypt lib to be used instead of the shipped ones.')
     parser.add_argument('-odt', '--on-demand_timeout', help='Pause searching while web UI is inactive for this timeout(in seconds).', type=int, default=0)
+    parser.add_argument('-hk', '--hash-key', default=None, action='append',
+                        help='Key for hash server')
     parser.add_argument('-sl', '--speed-limit',
                         help='Speed limit in kilometers per hour',
                         type=int, default=0)
