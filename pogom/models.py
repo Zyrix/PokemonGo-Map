@@ -1094,6 +1094,7 @@ def parse_gyms(args, gym_responses, wh_update_queue):
             # We have to convert pokemon ids to string so MongoDB can handle them.
             for member in gym_state_persist.get('memberships', []):
                 member['pokemon_data']['id'] = str(member['pokemon_data']['id'])
+                member['training_pokemon']['id'] = str(member['training_pokemon']['id'])
 
             gym_persist.append(gym_state_persist)
 

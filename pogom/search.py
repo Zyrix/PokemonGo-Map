@@ -35,6 +35,7 @@ from pgoapi import PGoApi
 from pgoapi.utilities import f2i
 from pgoapi import utilities as util
 from pgoapi.exceptions import AuthException
+from pgoapi.hash_server import HashServer
 
 from .models import parse_map, GymDetails, PokestopDetails, parse_gyms, parse_pokestops, MainWorker, WorkerStatus
 from .fakePogoApi import FakePogoApi
@@ -268,6 +269,7 @@ def search_overseer_thread(args, new_location_queue, pause_bit, heartb, db_updat
     scheduler_array = []
     account_queue = Queue()
     threadStatus = {}
+    key_scheduler = None
     threads = []
     has_started = False
 
@@ -288,6 +290,11 @@ def search_overseer_thread(args, new_location_queue, pause_bit, heartb, db_updat
         'type': 'Overseer',
         'scheduler': args.scheduler
     }
+
+    # Create the key scheduler.
+    if args.hash_key:
+        log.info('Enabling hashing key scheduler...')
+        key_scheduler = schedulers.KeyScheduler(args.hash_key)
 
     if(args.print_status):
         log.info('Starting status printer thread')
@@ -359,7 +366,7 @@ def search_overseer_thread(args, new_location_queue, pause_bit, heartb, db_updat
                    name='search-worker-{}'.format(i),
                    args=(args, account_queue, account_failures, search_items_queue, pause_bit,
                          threadStatus[workerId],
-                         db_updates_queue, wh_queue))
+                         db_updates_queue, wh_queue, key_scheduler))
         t.daemon = True
         threads.append(t)
         t.start()
@@ -497,7 +504,7 @@ def _generate_locations(current_location, step_distance, step_limit, worker_coun
     return results
 
 
-def search_worker_thread(args, account_queue, account_failures, search_items_queue, pause_bit, status, dbq, whq):
+def search_worker_thread(args, account_queue, account_failures, search_items_queue, pause_bit, status, dbq, whq, key_scheduler):
 
     log.debug('Search worker thread starting')
     queue_is_empty = False
@@ -632,6 +639,11 @@ def search_worker_thread(args, account_queue, account_failures, search_items_que
                 # doing this before check_login so it does not also have to be done there
                 # when the auth token is refreshed
                 api.set_position(*step_location)
+
+                if args.hash_key:
+                    key = key_scheduler.next()
+                    log.debug('Using key {} for this scan.'.format(key))
+                    api.activate_hash_server(key)
 
                 # Ok, let's get started -- check our login status.
                 check_login(args, account, api, step_location, status['proxy_url'])
@@ -803,6 +815,20 @@ def search_worker_thread(args, account_queue, account_failures, search_items_que
 
                         if pokestop_responses:
                             parse_pokestops(args, pokestop_responses, whq)
+
+                if args.hash_key:
+                    key_instance = key_scheduler.keys[key_scheduler.current()]
+                    key_instance['remaining'] = HashServer.status.get(
+                        'remaining', 0)
+
+                    if key_instance['maximum'] == 0:
+                        key_instance['maximum'] = HashServer.status.get(
+                            'maximum', 0)
+
+                    peak = key_instance['maximum'] - key_instance['remaining']
+
+                    if key_instance['peak'] < peak:
+                        key_instance['peak'] = peak
 
                 # Record the time and place the worker left off at.
                 status['last_scan_time'] = now()

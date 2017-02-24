@@ -206,6 +206,12 @@ def get_args():
                         help='Enable status page database update using STATUS_NAME as main worker name.')
     parser.add_argument('-spp', '--status-page-password', default=None,
                         help='Set the status page password')
+    parser.add_argument('-hk', '--hash-key', default=None, action='append',
+                        help='Key for hash server')
+    parser.add_argument('-tut', '--complete-tutorial', action='store_true',
+                        help=("Complete ToS and tutorial steps on accounts " +
+                              "if they haven't already."),
+                        default=False)
     parser.add_argument('-sl', '--speed-limit',
                         help='If next scan would cause the account to move above specified speed in kmph in a straight line, sleep until such time that it could reasonably move that distance',
                         type=int, default=0)
