@@ -1075,6 +1075,19 @@ function getGoogleSprite (index, sprite, displayHeight) {
   }
 }
 
+function isMedalPokemon(item) {
+    if (item['height'] == null && item['weight'] == null) {
+        return false
+    }
+
+    if ((item['pokemon_id'] === 19 && item['weight'] < 2.42) ||
+        (item['pokemon_id'] === 129 && item['weight'] > 13.12)) {
+        return true
+    }
+
+    return false
+}
+
 function setupPokemonMarker (item, map, perfectionLimit, isBounceDisabled) {
   var iv = 0
   if ('individual_attack' in item) {
@@ -1090,6 +1103,12 @@ function setupPokemonMarker (item, map, perfectionLimit, isBounceDisabled) {
   }
 
   var pokemonIndex = item['pokemon_id'] - 1
+
+  // Display big Magikarps different
+  if (item['pokemon_id'] == 129 && isMedalPokemon(item)) {
+    pokemonIndex = 251
+  }
+
   var sprite = pokemonSprites['gen2']
   var icon = getGoogleSprite(pokemonIndex, sprite, iconSize)
   var hideTimersAtZoomLevel = Store.get('hideTimersAtZoomLevel')
