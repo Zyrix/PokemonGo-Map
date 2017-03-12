@@ -789,13 +789,42 @@ var pGoStyleNight = [{
 }]
 
 var pokemonSprites = {
-    columns: 28,
+  normal: {
+    columns: 12,
+    iconWidth: 30,
+    iconHeight: 30,
+    spriteWidth: 360,
+    spriteHeight: 390,
+    filename: 'static/icons-sprite.png',
+    name: 'Normal'
+  },
+  gen2: {
+    columns: 25,
     iconWidth: 80,
     iconHeight: 80,
-    spriteWidth: 2240,
-    spriteHeight: 1440,
+    spriteWidth: 2000,
+    spriteHeight: 1600,
+    filename: 'static/icons-sprite-new-xl.png',
+    name: 'gen2'
+  },
+  highres: {
+    columns: 7,
+    iconWidth: 65,
+    iconHeight: 65,
+    spriteWidth: 455,
+    spriteHeight: 1430,
     filename: 'static/icons-large-sprite.png',
     name: 'High-Res'
+  },
+  shuffle: {
+    columns: 7,
+    iconWidth: 65,
+    iconHeight: 65,
+    spriteWidth: 455,
+    spriteHeight: 1430,
+    filename: 'static/icons-shuffle-sprite.png',
+    name: 'Shuffle'
+  }
 }
 
 //
@@ -1046,6 +1075,19 @@ function getGoogleSprite (index, sprite, displayHeight) {
   }
 }
 
+function isMedalPokemon(item) {
+    if (item['height'] == null && item['weight'] == null) {
+        return false
+    }
+
+    if ((item['pokemon_id'] === 19 && item['weight'] < 2.42) ||
+        (item['pokemon_id'] === 129 && item['weight'] > 13.12)) {
+        return true
+    }
+
+    return false
+}
+
 function setupPokemonMarker (item, map, perfectionLimit, isBounceDisabled) {
   var iv = 0
   if ('individual_attack' in item) {
@@ -1061,7 +1103,13 @@ function setupPokemonMarker (item, map, perfectionLimit, isBounceDisabled) {
   }
 
   var pokemonIndex = item['pokemon_id'] - 1
-  var sprite = pokemonSprites
+
+  // Display big Magikarps different
+  if (item['pokemon_id'] == 129 && isMedalPokemon(item)) {
+    pokemonIndex = 251
+  }
+
+  var sprite = pokemonSprites['gen2']
   var icon = getGoogleSprite(pokemonIndex, sprite, iconSize)
   var hideTimersAtZoomLevel = Store.get('hideTimersAtZoomLevel')
   var showTimers = Store.get('showTimers')
