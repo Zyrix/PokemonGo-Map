@@ -1014,6 +1014,18 @@ var StoreOptions = {
   'zoomLevel': {
     default: 16,
     type: StoreTypes.Number
+  },
+  'showMedal': {
+    default: false,
+    type: StoreTypes.Boolean
+  },
+  'showMedalMagikarp': {
+    default: true,
+    type: StoreTypes.Boolean
+  },
+  'showMedalRattata': {
+    default: true,
+    type: StoreTypes.Boolean
   }
 }
 
@@ -1076,7 +1088,7 @@ function getGoogleSprite (index, sprite, displayHeight) {
 }
 
 function isMedalPokemon(item) {
-    if (item['height'] == null && item['weight'] == null) {
+    if (item['weight'] == null) {
         return false
     }
 
