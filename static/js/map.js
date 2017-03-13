@@ -308,6 +308,10 @@ function initSidebar () {
   $('#spawnpoints-switch').prop('checked', Store.get('showSpawnpoints'))
   $('#ranges-switch').prop('checked', Store.get('showRanges'))
   $('#sound-switch').prop('checked', Store.get('playSound'))
+  $('#medal-wrapper').toggle(Store.get('showMedal'))
+  $('#medal-switch').prop('checked', Store.get('showMedal'))
+  $('#medal-magikarp-switch').prop('checked', Store.get('showMedalMagikarp'))
+  $('#medal-rattata-switch').prop('checked', Store.get('showMedalRattata'))
   $('#next-location').css('background-color', $('#geoloc-switch').prop('checked') ? '#e0e0e0' : '#ffffff')
 
   var icons = $('#pokemon-icons')
@@ -670,6 +674,23 @@ function customizePokemonMarker (marker, item, skipNotification) {
       if (marker.animationDisabled !== true) {
         marker.setAnimation(google.maps.Animation.BOUNCE)
       }
+    }
+  }
+
+  if (Store.get('showMedal') && isMedalPokemon(item)) {
+    if (!skipNotification) {
+      if (Store.get('playSound')) {
+        audio.play()
+      }
+      if (item['pokemon_id'] === 129) {
+        var sizeText = 'XL'
+      } else if (item['pokemon_id'] === 19) {
+        var sizeText = 'XS'
+      }
+      sendNotification(item['pokemon_name'] + ' ' + sizeText + ' ist aufgetaucht!', 'Gewicht: ' + Math.round((item['weight'] + 0.00001) * 100) / 100 + 'kg', 'static/icons/' + item['pokemon_id'] + '.png', item['latitude'], item['longitude'])
+    }
+    if (marker.animationDisabled !== true) {
+      marker.setAnimation(google.maps.Animation.BOUNCE)
     }
   }
 
@@ -2283,6 +2304,23 @@ $(function () {
 
   $('#sound-switch').change(function () {
     Store.set('playSound', this.checked)
+  })
+
+  $('#medal-switch').change(function () {
+    var wrapper = $('#medal-wrapper')
+    wrapper.toggle(this.checked)
+    Store.set('showMedal', this.checked)
+    updateMap()
+  })
+
+  $('#medal-rattata-switch').change(function () {
+    Store.set('showMedalRattata', this.checked)
+    updateMap()
+  })
+
+  $('#medal-magikarp-switch').change(function () {
+    Store.set('showMedalMagikarp', this.checked)
+    updateMap()
   })
 
   $('#geoloc-switch').change(function () {
