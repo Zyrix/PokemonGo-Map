@@ -904,7 +904,7 @@ var StoreOptions = {
     type: StoreTypes.Boolean
   },
   'showMedalRattata': {
-    default: true,
+    default: false,
     type: StoreTypes.Boolean
   },
   'showGyms': {
