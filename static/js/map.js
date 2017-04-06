@@ -41,9 +41,7 @@ var notifiedMinPerfection = null
 
 var buffer = []
 var reincludedPokemon = []
-var reincludedPerfectionPokemon = []
 var reids = []
-var repids = []
 
 var map
 var rawDataIsLoading = false
@@ -1068,8 +1066,6 @@ function loadRawData () {
       'oNeLng': oNeLng,
       'reids': String(reincludedPokemon),
       'eids': String(excludedPokemon),
-      'repids': String(reincludedPerfectionPokemon),
-      'epids': String(excludedPerfectionPokemon),
       'perflim': perfectionLimit
     },
     dataType: 'json',
@@ -1334,6 +1330,9 @@ function updateSpawnPoints () {
 }
 
 function updateMap () {
+  if (map.getBounds() === undefined)
+    return
+
   loadRawData().done(function (result) {
     $.each(result.pokemons, processPokemons)
     $.each(result.pokestops, processPokestops)
@@ -1371,10 +1370,6 @@ function updateMap () {
     reids = result.reids
     if (reids instanceof Array) {
       reincludedPokemon = reids.filter(function (e) { return this.indexOf(e) < 0 }, reincludedPokemon)
-    }
-    repids = result.repids
-    if (repids instanceof Array) {
-      reincludedPerfectionPokemon = repids.filter(function (e) { return this.indexOf(e) < 0 }, reincludedPerfectionPokemon)
     }
     timestamp = result.timestamp
     lastUpdateTime = Date.now()
@@ -2139,15 +2134,15 @@ $(function () {
       excludedPokemon = $selectExclude.val().map(Number)
       buffer = buffer.filter(function (e) { return this.indexOf(e) < 0 }, excludedPokemon)
       reincludedPokemon = reincludedPokemon.concat(buffer)
-      clearStaleMarkers()
+      updateMap()
       Store.set('remember_select_exclude', excludedPokemon)
     })
     $selectPerfectionExclude.on('change', function (e) {
       buffer = excludedPerfectionPokemon
       excludedPerfectionPokemon = $selectPerfectionExclude.val().map(Number)
       buffer = buffer.filter(function (e) { return this.indexOf(e) < 0 }, excludedPerfectionPokemon)
-      reincludedPerfectionPokemon = reincludedPerfectionPokemon.concat(buffer)
-      clearStaleMarkers()
+      reincludedPokemon = reincludedPokemon.concat(buffer)
+      updateMap()
       Store.set('remember_select_perfection_exclude', excludedPerfectionPokemon)
     })
     $textPerfectionLimit.on('change', function (e) {
