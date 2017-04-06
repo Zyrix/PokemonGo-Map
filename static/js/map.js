@@ -120,6 +120,11 @@ function removePokemonMarker (encounterId) { // eslint-disable-line no-unused-va
 }
 
 function initMap () { // eslint-disable-line no-unused-vars
+  if (Store.get('show_dialog')) {
+    $('#dialog').dialog();
+    Store.set('show_dialog', false)
+  }
+
   map = new google.maps.Map(document.getElementById('map'), {
     center: {
       lat: centerLat,

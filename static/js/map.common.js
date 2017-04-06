@@ -875,6 +875,10 @@ var StoreTypes = {
 
 // set the default parameters for you map here
 var StoreOptions = {
+  'show_dialog': {
+    default: true,
+    type: StoreTypes.Boolean
+  },
   'map_style': {
     default: 'roadmap', // roadmap, satellite, hybrid, nolabels_style, dark_style, style_light2, style_pgo, dark_style_nl, style_pgo_day, style_pgo_night, style_pgo_dynamic
     type: StoreTypes.String
