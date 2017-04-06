@@ -1015,10 +1015,6 @@ var StoreOptions = {
     default: 16,
     type: StoreTypes.Number
   },
-  'showMedal': {
-    default: false,
-    type: StoreTypes.Boolean
-  },
   'showMedalMagikarp': {
     default: true,
     type: StoreTypes.Boolean

@@ -306,8 +306,6 @@ function initSidebar () {
   $('#spawnpoints-switch').prop('checked', Store.get('showSpawnpoints'))
   $('#ranges-switch').prop('checked', Store.get('showRanges'))
   $('#sound-switch').prop('checked', Store.get('playSound'))
-  $('#medal-wrapper').toggle(Store.get('showMedal'))
-  $('#medal-switch').prop('checked', Store.get('showMedal'))
   $('#medal-magikarp-switch').prop('checked', Store.get('showMedalMagikarp'))
   $('#medal-rattata-switch').prop('checked', Store.get('showMedalRattata'))
   $('#next-location').css('background-color', $('#geoloc-switch').prop('checked') ? '#e0e0e0' : '#ffffff')
@@ -675,7 +673,7 @@ function customizePokemonMarker (marker, item, skipNotification) {
     }
   }
 
-  if (Store.get('showMedal') && isMedalPokemon(item)) {
+  if (((Store.get('showMedalMagikarp') && item['pokemon_id'] === 129) || (Store.get('showMedalRattata') && item['pokemon_id'] === 19)) && isMedalPokemon(item)) {
     if (!skipNotification) {
       if (Store.get('playSound')) {
         audio.play()
@@ -2299,13 +2297,6 @@ $(function () {
 
   $('#sound-switch').change(function () {
     Store.set('playSound', this.checked)
-  })
-
-  $('#medal-switch').change(function () {
-    var wrapper = $('#medal-wrapper')
-    wrapper.toggle(this.checked)
-    Store.set('showMedal', this.checked)
-    updateMap()
   })
 
   $('#medal-rattata-switch').change(function () {
