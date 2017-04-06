@@ -690,7 +690,7 @@ function customizePokemonMarker (marker, item, skipNotification) {
       } else if (item['pokemon_id'] === 19) {
         var sizeText = 'XS'
       }
-      sendNotification(item['pokemon_name'] + ' ' + sizeText + ' ist aufgetaucht!', 'Gewicht: ' + Math.round((item['weight'] + 0.00001) * 100) / 100 + 'kg', 'static/icons/' + item['pokemon_id'] + '.png', item['latitude'], item['longitude'])
+      sendNotification(item['pokemon_name'] + ' ' + sizeText + ' (' + Math.round((item['weight'] + 0.00001) * 100) / 100 + 'kg)', getNotifyText(item).fav_text, 'static/icons/' + item['pokemon_id'] + '.png', item['latitude'], item['longitude'])
     }
     if (marker.animationDisabled !== true) {
       marker.setAnimation(google.maps.Animation.BOUNCE)
