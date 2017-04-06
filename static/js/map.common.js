@@ -899,6 +899,14 @@ var StoreOptions = {
     default: '',
     type: StoreTypes.Number
   },
+  'showMedalMagikarp': {
+    default: true,
+    type: StoreTypes.Boolean
+  },
+  'showMedalRattata': {
+    default: true,
+    type: StoreTypes.Boolean
+  },
   'showGyms': {
     default: false,
     type: StoreTypes.Boolean
@@ -1015,11 +1023,11 @@ var StoreOptions = {
     default: 16,
     type: StoreTypes.Number
   },
-  'showMedalMagikarp': {
+  'notifyMedalMagikarp': {
     default: true,
     type: StoreTypes.Boolean
   },
-  'showMedalRattata': {
+  'notifyMedalRattata': {
     default: true,
     type: StoreTypes.Boolean
   }

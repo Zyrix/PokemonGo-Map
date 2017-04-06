@@ -281,6 +281,8 @@ function updateSearchStatus () {
 function initSidebar () {
   $('#pokemon-switch').prop('checked', Store.get('showPokemon'))
   $('#pokemon-filter-wrapper').toggle(Store.get('showPokemon'))
+  $('#show-medal-magikarp-switch').prop('checked', Store.get('showMedalMagikarp'))
+  $('#show-medal-rattata-switch').prop('checked', Store.get('showMedalRattata'))
   $('#gyms-switch').prop('checked', Store.get('showGyms'))
   $('#gym-sidebar-switch').prop('checked', Store.get('useGymSidebar'))
   $('#gym-sidebar-wrapper').toggle(Store.get('showGyms'))
@@ -306,8 +308,8 @@ function initSidebar () {
   $('#spawnpoints-switch').prop('checked', Store.get('showSpawnpoints'))
   $('#ranges-switch').prop('checked', Store.get('showRanges'))
   $('#sound-switch').prop('checked', Store.get('playSound'))
-  $('#medal-magikarp-switch').prop('checked', Store.get('showMedalMagikarp'))
-  $('#medal-rattata-switch').prop('checked', Store.get('showMedalRattata'))
+  $('#notify-medal-magikarp-switch').prop('checked', Store.get('notifyMedalMagikarp'))
+  $('#notify-medal-rattata-switch').prop('checked', Store.get('notifyMedalRattata'))
   $('#next-location').css('background-color', $('#geoloc-switch').prop('checked') ? '#e0e0e0' : '#ffffff')
 
   var icons = $('#pokemon-icons')
@@ -678,7 +680,7 @@ function customizePokemonMarker (marker, item, skipNotification) {
     }
   }
 
-  if (((Store.get('showMedalMagikarp') && item['pokemon_id'] === 129) || (Store.get('showMedalRattata') && item['pokemon_id'] === 19)) && isMedalPokemon(item)) {
+  if (((Store.get('notifyMedalMagikarp') && item['pokemon_id'] === 129) || (Store.get('notifyMedalRattata') && item['pokemon_id'] === 19)) && isMedalPokemon(item)) {
     if (!skipNotification) {
       if (Store.get('playSound')) {
         audio.play()
@@ -2263,6 +2265,17 @@ $(function () {
 
     buildSwitchChangeListener(mapData, ['pokemons'], 'showPokemon').bind(this)()
   })
+
+  $('#show-medal-rattata-switch').change(function () {
+    Store.set('showMedalRattata', this.checked)
+    updateMap()
+  })
+
+  $('#show-medal-magikarp-switch').change(function () {
+    Store.set('showMedalMagikarp', this.checked)
+    updateMap()
+  })
+
   $('#gyms-switch').change(function () {
     var options = {
       'duration': 500
@@ -2285,12 +2298,15 @@ $(function () {
     }
     buildSwitchChangeListener(mapData, ['gyms'], 'showGyms').bind(this)()
   })
+
   $('#scanned-switch').change(function () {
     buildSwitchChangeListener(mapData, ['scanned'], 'showScanned').bind(this)()
   })
+
   $('#spawnpoints-switch').change(function () {
     buildSwitchChangeListener(mapData, ['spawnpoints'], 'showSpawnpoints').bind(this)()
   })
+
   $('#ranges-switch').change(buildSwitchChangeListener(mapData, ['gyms', 'pokemons', 'pokestops'], 'showRanges'))
 
   $('#pokestops-switch').change(function () {
@@ -2312,13 +2328,13 @@ $(function () {
     Store.set('playSound', this.checked)
   })
 
-  $('#medal-rattata-switch').change(function () {
-    Store.set('showMedalRattata', this.checked)
+  $('#notify-medal-rattata-switch').change(function () {
+    Store.set('notifyMedalRattata', this.checked)
     updateMap()
   })
 
-  $('#medal-magikarp-switch').change(function () {
-    Store.set('showMedalMagikarp', this.checked)
+  $('#notify-medal-magikarp-switch').change(function () {
+    Store.set('notifyMedalMagikarp', this.checked)
     updateMap()
   })
 
