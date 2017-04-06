@@ -690,7 +690,8 @@ function customizePokemonMarker (marker, item, skipNotification) {
       } else if (item['pokemon_id'] === 19) {
         var sizeText = 'XS'
       }
-      sendNotification(item['pokemon_name'] + ' ' + sizeText + ' (' + Math.round((item['weight'] + 0.00001) * 100) / 100 + 'kg)', getNotifyText(item).fav_text, 'static/icons/' + item['pokemon_id'] + '.png', item['latitude'], item['longitude'])
+
+      sendNotification(item['pokemon_name'] + ' ' + sizeText + ' (' + Math.round((item['weight'] + 0.00001) * 100) / 100 + 'kg)', getNotifyText(item).fav_text, 'static/icons/' + 'hat.png', item['latitude'], item['longitude'])
     }
     if (marker.animationDisabled !== true) {
       marker.setAnimation(google.maps.Animation.BOUNCE)
@@ -947,12 +948,20 @@ function addListeners (marker) {
   return marker
 }
 
+function isPokemonVisible(item) {
+  var perfection = 100.0 * (item['individual_defense'] + item['individual_attack'] + item['individual_stamina']) / 45
+  var showMedal = isMedalPokemon(item) && ((Store.get('showMedalMagikarp') && item['pokemon_id'] === 129) || (Store.get('showMedalRattata') && item['pokemon_id'] === 19))
+  if (item['disappear_time'] < new Date().getTime() ||
+    ((excludedPokemon.indexOf(item['pokemon_id']) >= 0) && ((isNaN(perfection)) || (perfection < perfectionLimit)) && !showMedal) ||
+    ((excludedPerfectionPokemon.indexOf(item['pokemon_id']) >= 0) && (perfection >= perfectionLimit) && !showMedal)) {
+      return false
+    }
+  return true
+}
+
 function clearStaleMarkers () {
   $.each(mapData.pokemons, function (key, value) {
-    var perfection = 100.0 * (mapData.pokemons[key]['individual_defense'] + mapData.pokemons[key]['individual_attack'] + mapData.pokemons[key]['individual_stamina']) / 45
-    if (mapData.pokemons[key]['disappear_time'] < new Date().getTime() ||
-      ((excludedPokemon.indexOf(mapData.pokemons[key]['pokemon_id']) >= 0) && ((isNaN(perfection)) || (perfection < perfectionLimit))) ||
-      ((excludedPerfectionPokemon.indexOf(mapData.pokemons[key]['pokemon_id']) >= 0) && (perfection >= perfectionLimit))) {
+    if (!isPokemonVisible(mapData.pokemons[key])) {
       if (mapData.pokemons[key].marker.rangeCircle) {
         mapData.pokemons[key].marker.rangeCircle.setMap(null)
         delete mapData.pokemons[key].marker.rangeCircle
@@ -1045,6 +1054,22 @@ function loadRawData () {
   var neLat = nePoint.lat()
   var neLng = nePoint.lng()
 
+  var excludedPokemonRequest = excludedPokemon.slice()
+
+  if (Store.get('showMedalRattata')) {
+    var index = excludedPokemonRequest.indexOf(19)
+    if (index > -1) {
+      excludedPokemonRequest.splice(index, 1);
+    }
+  }
+
+  if (Store.get('showMedalMagikarp')) {
+    var index = excludedPokemonRequest.indexOf(129)
+    if (index > -1) {
+      excludedPokemonRequest.splice(index, 1);
+    }
+  }
+
   return $.ajax({
     url: 'raw_data',
     type: 'GET',
@@ -1070,7 +1095,7 @@ function loadRawData () {
       'oNeLat': oNeLat,
       'oNeLng': oNeLng,
       'reids': String(reincludedPokemon),
-      'eids': String(excludedPokemon),
+      'eids': String(excludedPokemonRequest),
       'perflim': perfectionLimit
     },
     dataType: 'json',
@@ -1105,11 +1130,7 @@ function processPokemons (i, item) {
     return false // in case the checkbox was unchecked in the meantime.
   }
 
-  var perfection = 100.0 * (item['individual_attack'] + item['individual_defense'] + item['individual_stamina']) / 45
-  if (!(item['encounter_id'] in mapData.pokemons) &&
-    item['disappear_time'] > Date.now() &&
-    (((excludedPokemon.indexOf(item['pokemon_id']) < 0) && ((isNaN(perfection)) || (perfection < perfectionLimit))) ||
-    ((excludedPerfectionPokemon.indexOf(item['pokemon_id']) < 0) && (perfection >= perfectionLimit)))) {
+  if (!(item['encounter_id'] in mapData.pokemons) && isPokemonVisible(item)) {
       // add marker to map and item to dict
       if (item.marker) {
         item.marker.setMap(null)
@@ -2268,11 +2289,13 @@ $(function () {
 
   $('#show-medal-rattata-switch').change(function () {
     Store.set('showMedalRattata', this.checked)
+    reincludedPokemon = reincludedPokemon.concat(19)
     updateMap()
   })
 
   $('#show-medal-magikarp-switch').change(function () {
     Store.set('showMedalMagikarp', this.checked)
+    reincludedPokemon = reincludedPokemon.concat(129)
     updateMap()
   })
 
