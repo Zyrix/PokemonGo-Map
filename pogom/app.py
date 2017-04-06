@@ -189,23 +189,12 @@ class Pogom(Flask):
                     else:
                         d['pokemons'] = d['pokemons'] + (Pokemon.get_active(swLat, swLng, neLat, neLng, oSwLat=oSwLat, oSwLng=oSwLng, oNeLat=oNeLat, oNeLng=oNeLng))
 
-            if request.args.get('epids'):
-                epids = [int(x) for x in request.args.get('epids').split(',')]
-                d['pokemons'] = [x for x in d['pokemons'] if x['individual_attack'] is None or
-                                 ((x['individual_attack'] +
-                                  x['individual_defense'] +
-                                  x['individual_stamina']) / 45.0 * 100 >= perfectionLimit and
-                                 x['pokemon_id'] not in epids)]
-
             if request.args.get('reids'):
+                used = set()
                 reids = [int(x) for x in request.args.get('reids').split(',')]
+                reids = [x for x in reids if x not in used and (used.add(x) or True)]
                 d['pokemons'] = d['pokemons'] + (Pokemon.get_active_by_id(reids, swLat, swLng, neLat, neLng))
                 d['reids'] = reids
-
-            if request.args.get('repids'):
-                repids = [int(x) for x in request.args.get('repids').split(',')]
-                d['pokemons'] = d['pokemons'] + (Pokemon.get_active_by_id(repids, swLat, swLng, neLat, neLng))
-                d['repids'] = repids
 
         if request.args.get('pokestops', 'true') == 'true':
             if lastpokestops != 'true':
