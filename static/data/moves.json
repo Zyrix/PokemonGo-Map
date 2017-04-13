@@ -1056,159 +1056,315 @@
 		"dps": 4.68
 	},
 	"243": {
-		"name": "Konter",
-		"type": "Fighting"
-	},
-	"244": {
-		"name": "Pulverschnee",
-		"type": "Ice"
-	},
-	"245": {
-		"name": "Nahkampf",
-		"type": "Fighting"
-	},
-	"246": {
-		"name": "Wuchtschlag",
-		"type": "Fighting"
-	},
-	"247": {
-		"name": "Fokusstoß",
-		"type": "Fighting"
-	},
-	"248": {
-		"name": "Aurorastrahl",
-		"type": "Ice"
-	},
-	"249": {
-		"name": "Ladestrahl",
-		"type": "Electric"
-	},
-	"250": {
-		"name": "Voltwechsel",
-		"type": "Electric"
-	},
-	"251": {
-		"name": "Stromstoß",
-		"type": "Electric"
-	},
-	"252": {
-		"name": "Blitzkanone",
-		"type": "Electric"
-	},
-	"253": {
-		"name": "Drachenrute",
-		"type": "Dragon"
-	},
-	"254": {
-		"name": "Lawine",
-		"type": "Ice"
-	},
-	"255": {
-		"name": "Luftschnitt",
-		"type": "Flying"
-	},
-	"256": {
-		"name": "Sturzflug",
-		"type": "Flying"
-	},
-	"257": {
-		"name": "Himmelsfeger",
-		"type": "Flying"
-	},
-	"258": {
-		"name": "Sandgrab",
-		"type": "Ground"
-	},
-	"259": {
-		"name": "Felswurf",
-		"type": "Rock"
-	},
-	"260": {
-		"name": "Plage",
-		"type": "Bug"
-	},
-	"261": {
-		"name": "Verzweifler",
-		"type": "Normal"
-	},
-	"262": {
-		"name": "Silberhauch",
-		"type": "Bug"
-	},
-	"263": {
-		"name": "Erstauner",
-		"type": "Ghost"
-	},
-	"264": {
-		"name": "Bürde",
-		"type": "Ghost"
-	},
-	"265": {
-		"name": "Nachtnebel",
-		"type": "Ghost"
-	},
-	"266": {
-		"name": "Eisenschweif",
-		"type": "Steel"
-	},
-	"267": {
-		"name": "Gyroball",
-		"type": "Steel"
-	},
-	"268": {
-		"name": "Rammboss",
-		"type": "Steel"
-	},
-	"269": {
-		"name": "Feuerwirbel",
-		"type": "Fire"
-	},
-	"270": {
-		"name": "Hitzekoller",
-		"type": "Fire"
-	},
-	"271": {
-		"name": "Kugelsaat",
-		"type": "Grass"
-	},
-	"272": {
-		"name": "Strauchler",
-		"type": "Grass"
-	},
-	"273": {
-		"name": "Energieball",
-		"type": "Grass"
-	},
-	"274": {
-		"name": "Sondersensor",
-		"type": "Psychic"
-	},
-	"275": {
-		"name": "Seher",
-		"type": "Psychic"
-	},
-	"276": {
-		"name": "Spiegelcape",
-		"type": "Psychic"
-	},
-	"277": {
-		"name": "Wutanfall",
-		"type": "Dragon"
-	},
-	"278": {
-		"name": "Standpauke",
-		"type": "Dark"
-	},
-	"279": {
-		"name": "Knirscher",
-		"type": "Dark"
-	},
-	"280": {
-		"name": "Schmarotzer",
-		"type": "Dark"
-	},
-	"281": {
-		"name": "Kraftreserve",
-		"type": "Normaö"
-	}
+        "name": "Konter",
+        "type": "Fighting",
+        "damage": 8,
+        "duration": 900,
+        "energy": 12,
+        "dps": 13.33
+    },
+    "244": {
+        "name": "Pulverschnee",
+        "type": "Ice",
+        "damage": 6,
+        "duration": 1000,
+        "energy": 15,
+        "dps": 6
+    },
+    "245": {
+        "name": "Nahkampf",
+        "type": "Fighting",
+        "damage": 100,
+        "duration": 2300,
+        "energy": 100,
+        "dps": 43.48
+    },
+    "246": {
+        "name": "Wuchtschlag",
+        "type": "Fighting",
+        "damage": 90,
+        "duration": 2700,
+        "energy": 50,
+        "dps": 33.33
+    },
+    "247": {
+        "name": "Fokusstoß",
+        "type": "Fighting",
+        "damage": 140,
+        "duration": 3500,
+        "energy": 140,
+        "dps": 40
+    },
+    "248": {
+        "name": "Aurorastrahl",
+        "type": "Ice",
+        "damage": 80,
+        "duration": 3550,
+        "energy": 50,
+        "dps": 22.54
+    },
+    "249": {
+        "name": "Ladestrahl",
+        "type": "Electric",
+        "damage": 8,
+        "duration": 1100,
+        "energy": 15,
+        "dps": 7.27
+    },
+    "250": {
+        "name": "Voltwechsel",
+        "type": "Electric",
+        "damage": 20,
+        "duration": 2300,
+        "energy": 25,
+        "dps": 8.7
+    },
+    "251": {
+        "name": "Stromstoß",
+        "type": "Electric",
+        "damage": 90,
+        "duration": 2600,
+        "energy": 50,
+        "dps": 34.62
+    },
+    "252": {
+        "name": "Blitzkanone",
+        "type": "Electric",
+        "damage": 140,
+        "duration": 3700,
+        "energy": 100,
+        "dps": 37.84
+    },
+    "253": {
+        "name": "Drachenrute",
+        "type": "Dragon",
+        "damage": 15,
+        "duration": 1100,
+        "energy": 9,
+        "dps": 13.64
+    },
+    "254": {
+        "name": "Lawine",
+        "type": "Ice",
+        "damage": 90,
+        "duration": 2700,
+        "energy": 50,
+        "dps": 33.33
+    },
+    "255": {
+        "name": "Luftschnitt",
+        "type": "Flying",
+        "damage": 14,
+        "duration": 1200,
+        "energy": 10,
+        "dps": 11.67
+    },
+    "256": {
+        "name": "Sturzflug",
+        "type": "Flying",
+        "damage": 90,
+        "duration": 2000,
+        "energy": 100,
+        "dps": 45
+    },
+    "257": {
+        "name": "Himmelsfeger",
+        "type": "Flying",
+        "damage": 70,
+        "duration": 2000,
+        "energy": 50,
+        "dps": 35
+    },
+    "258": {
+        "name": "Sandgrab",
+        "type": "Ground",
+        "damage": 80,
+        "duration": 4000,
+        "energy": 50,
+        "dps": 20
+    },
+    "259": {
+        "name": "Felswurf",
+        "type": "Rock",
+        "damage": 50,
+        "duration": 2100,
+        "energy": 33,
+        "dps": 23.81
+    },
+    "260": {
+        "name": "Plage",
+        "type": "Bug",
+        "damage": 10,
+        "duration": 1100,
+        "energy": 14,
+        "dps": 9.09
+    },
+    "261": {
+        "name": "Verzweifler",
+        "type": "Bug",
+        "damage": 15,
+        "duration": 1500,
+        "energy": 15,
+        "dps": 10
+    },
+    "262": {
+        "name": "Silberhauch",
+        "type": "Bug",
+        "damage": 70,
+        "duration": 3700,
+        "energy": 33,
+        "dps": 18.92
+    },
+    "263": {
+        "name": "Erstauner",
+        "type": "Ghost",
+        "damage": 8,
+        "duration": 1100,
+        "energy": 14,
+        "dps": 7.27
+    },
+    "264": {
+        "name": "Bürde",
+        "type": "Ghost",
+        "damage": 10,
+        "duration": 1200,
+        "energy": 15,
+        "dps": 8.33
+    },
+    "265": {
+        "name": "Nachtnebel",
+        "type": "Ghost",
+        "damage": 60,
+        "duration": 2600,
+        "energy": 50,
+        "dps": 23.08
+    },
+    "266": {
+        "name": "Eisenschweif",
+        "type": "Steel",
+        "damage": 15,
+        "duration": 1100,
+        "energy": 7,
+        "dps": 13.64
+    },
+    "267": {
+        "name": "Gyroball",
+        "type": "Steel",
+        "damage": 80,
+        "duration": 3300,
+        "energy": 50,
+        "dps": 24.24
+    },
+    "268": {
+        "name": "Rammboss",
+        "type": "Steel",
+        "damage": 70,
+        "duration": 2100,
+        "energy": 50,
+        "dps": 33.33
+    },
+    "269": {
+        "name": "Feuerwirbel",
+        "type": "Fire",
+        "damage": 14,
+        "duration": 1100,
+        "energy": 10,
+        "dps": 12.73
+    },
+    "270": {
+        "name": "Hitzekoller",
+        "type": "Fire",
+        "damage": 160,
+        "duration": 4000,
+        "energy": 100,
+        "dps": 40
+    },
+    "271": {
+        "name": "Kugelsaat",
+        "type": "Grass",
+        "damage": 8,
+        "duration": 1100,
+        "energy": 14,
+        "dps": 7.27
+    },
+    "272": {
+        "name": "Strauchler",
+        "type": "Grass",
+        "damage": 90,
+        "duration": 2600,
+        "energy": 50,
+        "dps": 34.62
+    },
+    "273": {
+        "name": "Energieball",
+        "type": "Grass",
+        "damage": 90,
+        "duration": 3900,
+        "energy": 50,
+        "dps": 23.08
+    },
+    "274": {
+        "name": "Sondersensor",
+        "type": "Psychic",
+        "damage": 12,
+        "duration": 1100,
+        "energy": 12,
+        "dps": 10.91
+    },
+    "275": {
+        "name": "Seher",
+        "type": "Psychic",
+        "damage": 120,
+        "duration": 2700,
+        "energy": 100,
+        "dps": 44.44
+    },
+    "276": {
+        "name": "Spiegelcape",
+        "type": "Psychic",
+        "damage": 60,
+        "duration": 2600,
+        "energy": 50,
+        "dps": 23.08
+    },
+    "277": {
+        "name": "Wutanfall",
+        "type": "Dragon",
+        "damage": 110,
+        "duration": 3900,
+        "energy": 50,
+        "dps": 28.21
+    },
+    "278": {
+        "name": "Standpauke",
+        "type": "Dark",
+        "damage": 12,
+        "duration": 1100,
+        "energy": 12,
+        "dps": 10.91
+    },
+    "279": {
+        "name": "Knirscher",
+        "type": "Dark",
+        "damage": 70,
+        "duration": 3200,
+        "energy": 33,
+        "dps": 21.88
+    },
+    "280": {
+        "name": "Schmarotzer",
+        "type": "Dark",
+        "damage": 70,
+        "duration": 2000,
+        "energy": 50,
+        "dps": 35
+    },
+    "281": {
+        "name": "Kraftreserve",
+        "type": "Normal",
+        "damage": 15,
+        "duration": 1500,
+        "energy": 15,
+        "dps": 10
+    }
 }
