@@ -1683,19 +1683,19 @@ function showGymDetails (id) { // eslint-disable-line no-unused-vars
 
     if (result.team_id === 0) {
       gymLevelStr = `
-        <center class="team-${result.team_id}-text">
-          <b class="team-${result.team_id}-text">Uncontested - 1 Free Slot</b>
+        <center>
+          <b>Uncontested - 1 Free Slot</b>
         </center>`
     } else {
       gymLevelStr = `<div>
-        <b class="team-${result.team_id}-text">Level ${gymLevel}${freeSlotsStr}</b>
+        <b>Level ${gymLevel}${freeSlotsStr}</b>
       </div>`
     }
     var pokemonHtml = ''
     var headerHtml = `
-      <center class="team-${result.team_id}-text">
+      <center>
         <div>
-          <b class="team-${result.team_id}-text">${result.name || ''}</b>
+          <b>${result.name || ''}</b>
         </div>
         <img height="100px" style="padding: 5px;" src="static/forts/${gymTypes[result.team_id]}_large.png">
         <div class="prestige-bar team-${result.team_id}">
@@ -1725,17 +1725,17 @@ function showGymDetails (id) { // eslint-disable-line no-unused-vars
             <td width="30px">
               <i class="pokemon-sprite n${pokemon.pokemon_id}"></i>
             </td>
-            <td class="team-${result.team_id}-text">
+            <td>
               <div style="line-height:1em;">${pokemon.pokemon_name}</div>
               <div class="cp">CP ${pokemon.pokemon_cp}</div>
             </td>
-            <td width="190" class="team-${result.team_id}-text" align="center">
+            <td width="190" align="center">
               <div class="trainer-level">${pokemon.trainer_level}</div>
               <div style="line-height: 1em;">${pokemon.trainer_name}</div>
             </td>
             <td width="10">
               <!--<a href="#" onclick="toggleGymPokemonDetails(this)">-->
-                <i class="team-${result.team_id}-text fa fa-angle-double-down"></i>
+                <i class="fa fa-angle-double-down"></i>
               <!--</a>-->
             </td>
           </tr>
@@ -1763,7 +1763,7 @@ function showGymDetails (id) { // eslint-disable-line no-unused-vars
                 <div class="iv" style="width: 36px;"">
                   <div class="type">PERFECT</div>
                   <div class="value">
-                    ${perfectPercent}<span style="font-size: .6em;">%</span>
+                    ${perfectPercent.toFixed(0)}<span style="font-size: .6em;">%</span>
                   </div>
                 </div>
               </div>
@@ -1773,7 +1773,7 @@ function showGymDetails (id) { // eslint-disable-line no-unused-vars
                 <div class="move">
                   <div class="name">
                     ${pokemon.move_1_name}
-                    <div class="type ${pokemon.move_1_type.toLowerCase()}">${pokemon.move_1_type}</div>
+                    <div class="type ${pokemon.move_1_type['type_en'].toLowerCase()}">${pokemon.move_1_type['type']}</div>
                   </div>
                   <div class="damage">
                     ${pokemon.move_1_damage}
@@ -1783,7 +1783,7 @@ function showGymDetails (id) { // eslint-disable-line no-unused-vars
                 <div class="move">
                   <div class="name">
                     ${pokemon.move_2_name}
-                    <div class="type ${pokemon.move_2_type.toLowerCase()}">${pokemon.move_2_type}</div>
+                    <div class="type ${pokemon.move_2_type['type_en'].toLowerCase()}">${pokemon.move_2_type['type']}</div>
                     <div>
                       <i class="move-bar-sprite move-bar-sprite-${moveEnergy}"></i>
                     </div>
@@ -1803,10 +1803,10 @@ function showGymDetails (id) { // eslint-disable-line no-unused-vars
       pokemonHtml = ''
     } else {
       pokemonHtml = `
-        <center class="team-${result.team_id}-text">
+        <center>
           Gym Leader:<br>
-          <i class="pokemon-large-sprite n${result.guard_pokemon_id}"></i><br>
-          <b class="team-${result.team_id}-text">${result.guard_pokemon_name}</b>
+          <i class="pokemon-sprite n${result.guard_pokemon_id}"></i><br>
+          <b>${result.guard_pokemon_name}</b>
 
           <p style="font-size: .75em; margin: 5px;">
             No additional gym information is available for this gym. Make sure you are collecting <a href="https://pgm.readthedocs.io/en/develop/extras/gyminfo.html">detailed gym info.</a>
