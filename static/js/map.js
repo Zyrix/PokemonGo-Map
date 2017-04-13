@@ -1678,13 +1678,13 @@ function showGymDetails (id) { // eslint-disable-line no-unused-vars
     var prestigePercentage = (result.gym_points / nextLvlPrestige) * 100
     var lastScannedDate = new Date(result.last_scanned)
     var freeSlots = result.pokemon.length ? gymLevel - result.pokemon.length : 0
-    var freeSlotsStr = freeSlots ? ` - ${freeSlots} Free Slots` : ''
+    var freeSlotsStr = freeSlots ? ` - ${freeSlots} Freie Plätze` : ''
     var gymLevelStr = ''
 
     if (result.team_id === 0) {
       gymLevelStr = `
         <center>
-          <b>Uncontested - 1 Free Slot</b>
+          <b>Neutral - 1 freier Platz</b>
         </center>`
     } else {
       gymLevelStr = `<div>
@@ -1707,7 +1707,7 @@ function showGymDetails (id) { // eslint-disable-line no-unused-vars
         </div>
         ${gymLevelStr}
         <div style="font-size: .7em;">
-          Last Scanned: ${lastScannedDate.getFullYear()}-${pad(lastScannedDate.getMonth() + 1)}-${pad(lastScannedDate.getDate())} ${pad(lastScannedDate.getHours())}:${pad(lastScannedDate.getMinutes())}:${pad(lastScannedDate.getSeconds())}
+          Aktualisierung: ${lastScannedDate.getFullYear()}-${pad(lastScannedDate.getMonth() + 1)}-${pad(lastScannedDate.getDate())} ${pad(lastScannedDate.getHours())}:${pad(lastScannedDate.getMinutes())}:${pad(lastScannedDate.getSeconds())}
         </div>
         <div>
           <a href='javascript:void(0);' onclick='javascript:openMapDirections(${result.latitude},${result.longitude});' title='Auf Karte anzeigen'>Navigation</a>
@@ -1727,7 +1727,7 @@ function showGymDetails (id) { // eslint-disable-line no-unused-vars
             </td>
             <td>
               <div style="line-height:1em;">${pokemon.pokemon_name}</div>
-              <div class="cp">CP ${pokemon.pokemon_cp}</div>
+              <div class="cp">WP ${pokemon.pokemon_cp}</div>
             </td>
             <td width="190" align="center">
               <div class="trainer-level">${pokemon.trainer_level}</div>
@@ -1761,7 +1761,7 @@ function showGymDetails (id) { // eslint-disable-line no-unused-vars
                   </div>
                 </div>
                 <div class="iv" style="width: 36px;"">
-                  <div class="type">PERFECT</div>
+                  <div class="type">IV</div>
                   <div class="value">
                     ${perfectPercent.toFixed(0)}<span style="font-size: .6em;">%</span>
                   </div>
@@ -1809,8 +1809,7 @@ function showGymDetails (id) { // eslint-disable-line no-unused-vars
           <b>${result.guard_pokemon_name}</b>
 
           <p style="font-size: .75em; margin: 5px;">
-            No additional gym information is available for this gym. Make sure you are collecting <a href="https://pgm.readthedocs.io/en/develop/extras/gyminfo.html">detailed gym info.</a>
-            If you have detailed gym info collection running, this gym's Pokemon information may be out of date.
+            Keine Zusatz-Informationen verfügbar für diese Arena.
           </p>
         </center>
       `
