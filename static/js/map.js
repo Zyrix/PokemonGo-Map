@@ -383,7 +383,7 @@ function gymLabel (teamName, teamId, gymPoints, latitude, longitude, lastScanned
   for (var i = 0; i < members.length; i++) {
     memberStr += `
       <span class="gym-member" title="${members[i].pokemon_name} | ${members[i].trainer_name} (Lvl ${members[i].trainer_level})">
-        <i class="pokemon-sprite n${members[i].pokemon_id}"></i>
+        <i class="pokemon-sprite-gym n${members[i].pokemon_id}"></i>
         <span class="cp team-${teamId}">${members[i].pokemon_cp}</span>
       </span>`
   }
@@ -1722,12 +1722,13 @@ function showGymDetails (id) { // eslint-disable-line no-unused-vars
 
         pokemonHtml += `
           <tr onclick=toggleGymPokemonDetails(this)>
-            <td width="30px">
-              <i class="pokemon-sprite n${pokemon.pokemon_id}"></i>
+            <td width="50px">
+              <i class="pokemon-sprite-gym n${pokemon.pokemon_id}"></i>
             </td>
             <td>
               <div style="line-height:1em;">${pokemon.pokemon_name}</div>
               <div class="cp">WP ${pokemon.pokemon_cp}</div>
+              <div class="cp">IV ${perfectPercent.toFixed(0)}%</div>
             </td>
             <td width="190" align="center">
               <div class="trainer-level">${pokemon.trainer_level}</div>
@@ -1740,7 +1741,7 @@ function showGymDetails (id) { // eslint-disable-line no-unused-vars
             </td>
           </tr>
           <tr class="details">
-            <td colspan="2">
+            <td colspan="4">
               <div class="ivs">
                 <div class="iv">
                   <div class="type">ATK</div>
@@ -1760,38 +1761,23 @@ function showGymDetails (id) { // eslint-disable-line no-unused-vars
                     ${pokemon.iv_stamina}
                   </div>
                 </div>
-                <div class="iv" style="width: 36px;"">
-                  <div class="type">IV</div>
-                  <div class="value">
-                    ${perfectPercent.toFixed(0)}<span style="font-size: .6em;">%</span>
-                  </div>
-                </div>
               </div>
-            </td>
-            <td colspan="2">
               <div class="moves">
                 <div class="move">
                   <div class="name">
-                    ${pokemon.move_1_name}
-                    <div class="type ${pokemon.move_1_type['type_en'].toLowerCase()}">${pokemon.move_1_type['type']}</div>
+                    ${pokemon.move_1_name} (${pokemon.move_1_damage})
                   </div>
-                  <div class="damage">
-                    ${pokemon.move_1_damage}
-                  </div>
+                  <div class="type ${pokemon.move_1_type['type_en'].toLowerCase()}">${pokemon.move_1_type['type']}</div>
                 </div>
                 <br>
                 <div class="move">
                   <div class="name">
-                    ${pokemon.move_2_name}
-                    <div class="type ${pokemon.move_2_type['type_en'].toLowerCase()}">${pokemon.move_2_type['type']}</div>
-                    <div>
-                      <i class="move-bar-sprite move-bar-sprite-${moveEnergy}"></i>
-                    </div>
+                    ${pokemon.move_2_name} (${pokemon.move_2_damage})
                   </div>
-                  <div class="damage">
-                    ${pokemon.move_2_damage}
-                  </div>
+                  <div class="type ${pokemon.move_2_type['type_en'].toLowerCase()}">${pokemon.move_2_type['type']}</div>
                 </div>
+                <br>
+                <div><i class="move-bar-sprite move-bar-sprite-${moveEnergy}"></i></div>
               </div>
             </td>
           </tr>

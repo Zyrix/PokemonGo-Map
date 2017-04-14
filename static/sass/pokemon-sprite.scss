@@ -15,3 +15,24 @@
     }
   }
 }
+
+.pokemon-sprite-gym {
+  display: inline-block;
+  background-image: url(../../../icons-sprite-new.png);
+  background-repeat: no-repeat;
+  position: relative;
+  -moz-transform-origin: 0 0;
+  transform: scale(0.5) translateX(40px) translateY(-40px);
+  height: 40px;
+  width: 40px;
+  margin-bottom: -40px;
+  margin-left: -40px;
+
+  @for $i from 1 through 251 {
+    &.n#{$i} {
+      background-position: -#{(($i - 1) % 25) * 80}px -#{floor(($i - 1) / 25) * 80}px;
+      height: 80px;
+      width: 80px;
+    }
+  }
+}

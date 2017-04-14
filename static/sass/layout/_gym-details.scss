@@ -13,7 +13,7 @@
     height: -webkit-calc(100% - 3.5em);
     height: -moz-calc(100% - 3.5em);
     height: calc(100% - 3.5em);
-    max-width: 65%;
+    max-width: 70%;
     overflow-y: auto;
     padding: 1em 0 4em 0;
     position: fixed;
@@ -163,8 +163,8 @@
     }
 
     .ivs {
-      float:left;
-      margin-right: 20px;
+      float: left;
+      margin-right: 10px;
 
       .iv {
         text-align: center;
@@ -185,10 +185,12 @@
     }
 
     .moves {
+      width: 70%;
       line-height: 1em;
       color: black;
       font-size: .8em;
-      // float: right;
+      float: right;
+      clear: right;
 
       // .move {
       //   display: block;
@@ -201,17 +203,18 @@
       // }
 
       .move {
+        margin-bottom: 5px;
         .name {
+          font-size: 12px;
           float: left;
-          clear: left;
 
           .move-bar-sprite {
-            margin-top: 2px;
+            margin-top: 5px;
           }
         }
 
         .type {
-          margin-top: 2px;
+          margin-left: 5px;
           font-size: 10px;
           display: inline-block;
           vertical-align: middle;
@@ -221,6 +224,8 @@
           color: white;
           font-family: Roboto,Arial,sans-serif;
           font-weight: 300;
+          float: right;
+          clear: right;
 
 
           &.fairy {
@@ -315,7 +320,6 @@
 
       .damage {
         float: right;
-        margin-top: 2px;
         font-family: Roboto;
       }
     }
