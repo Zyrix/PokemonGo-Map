@@ -769,7 +769,8 @@ class Gym(BaseModel):
 
             for p in pokemon:
                 p['pokemon_name'] = get_pokemon_name(p['pokemon_id'])
-                gyms[p['gym_id']]['pokemon'].append(p)
+                if args.full_version:
+                    gyms[p['gym_id']]['pokemon'].append(p)
 
             details = (GymDetails
                        .select(

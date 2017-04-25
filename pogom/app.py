@@ -35,7 +35,10 @@ class Pogom(Flask):
         self.route("/stats", methods=['GET'])(self.get_stats)
         self.route("/status", methods=['GET'])(self.get_status)
         self.route("/status", methods=['POST'])(self.post_status)
-        self.route("/gym_data", methods=['GET'])(self.get_gymdata)
+
+        args = get_args()
+        if args.full_version:
+            self.route("/gym_data", methods=['GET'])(self.get_gymdata)
 
     def set_search_control(self, control):
         self.search_control = control
