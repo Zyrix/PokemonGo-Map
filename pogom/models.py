@@ -769,7 +769,7 @@ class Gym(BaseModel):
 
             for p in pokemon:
                 p['pokemon_name'] = get_pokemon_name(p['pokemon_id'])
-                if args.full_version:
+                if args.version == 'full':
                     gyms[p['gym_id']]['pokemon'].append(p)
 
             details = (GymDetails
