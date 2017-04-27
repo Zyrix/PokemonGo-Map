@@ -745,8 +745,8 @@ class Gym(BaseModel):
                        .select()
                        .where((Gym.latitude > 48.1595) &
                               (Gym.longitude > 11.5379) &
-                              (Gym.latitude <= 48.1828) &
-                              (Gym.longitude <= 11.5907))
+                              (Gym.latitude <= 48.1867) &
+                              (Gym.longitude <= 11.5909))
                        .dicts())
 
         # Performance: Disable the garbage collector prior to creating a (potentially) large dict with append().
