@@ -37,7 +37,7 @@ class Pogom(Flask):
         self.route("/status", methods=['POST'])(self.post_status)
 
         args = get_args()
-        if args.version == 'full':
+        if args.version == 'full' or args.version == 'mystic':
             self.route("/gym_data", methods=['GET'])(self.get_gymdata)
 
     def set_search_control(self, control):
