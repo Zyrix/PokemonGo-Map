@@ -740,6 +740,15 @@ class Gym(BaseModel):
                               (Gym.longitude <= neLng))
                        .dicts())
 
+        if args.version == 'mystic':
+            results = (Gym
+                       .select()
+                       .where((Gym.latitude > 48.1595) &
+                              (Gym.longitude > 11.5379) &
+                              (Gym.latitude <= 48.1828) &
+                              (Gym.longitude <= 11.5907))
+                       .dicts())
+
         # Performance: Disable the garbage collector prior to creating a (potentially) large dict with append().
         gc.disable()
 
@@ -769,7 +778,7 @@ class Gym(BaseModel):
 
             for p in pokemon:
                 p['pokemon_name'] = get_pokemon_name(p['pokemon_id'])
-                if args.version == 'full':
+                if args.version == 'full' or args.version == 'mystic':
                     gyms[p['gym_id']]['pokemon'].append(p)
 
             details = (GymDetails
