@@ -1150,7 +1150,7 @@ function processPokemons (i, item) {
   if ((item['encounter_id'] in mapData.pokemons) && isPokemonVisible(item) &&
       (mapData.pokemons[item['encounter_id']]['individual_attack'] == null) &&
       (item['individual_attack'] != null)) {
-    pokemon_list = {}
+    var pokemon_list = {}
     pokemon_list[item['encounter_id']] = item
     mapData.pokemons[item['encounter_id']] = item
     redrawPokemon(pokemon_list)
