@@ -1134,6 +1134,7 @@ function processPokemons (i, item) {
         ((item['encounter_id'] in mapData.pokemons) &&
          (mapData.pokemons[item['encounter_id']]['individual_attack'] == null) &&
          (item['individual_attack'] != null)))) {
+      // remove marker if it was already here (eg without IV)
       if (item['encounter_id'] in mapData.pokemons) {
         removePokemonMarker(item['encounter_id'])
       }
