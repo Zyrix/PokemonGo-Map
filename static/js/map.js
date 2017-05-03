@@ -1130,10 +1130,7 @@ function processPokemons (i, item) {
     return false // in case the checkbox was unchecked in the meantime.
   }
 
-  if (isPokemonVisible(item) && (!(item['encounter_id'] in mapData.pokemons) ||
-        ((item['encounter_id'] in mapData.pokemons) &&
-         (mapData.pokemons[item['encounter_id']]['individual_attack'] == null) &&
-         (item['individual_attack'] != null)))) {
+  if (!(item['encounter_id'] in mapData.pokemons) && isPokemonVisible(item)) {
       // remove marker if it was already here (eg without IV)
       if (item['encounter_id'] in mapData.pokemons) {
         removePokemonMarker(item['encounter_id'])
@@ -1147,6 +1144,16 @@ function processPokemons (i, item) {
         customizePokemonMarker(item.marker, item)
         mapData.pokemons[item['encounter_id']] = item
     }
+  }
+
+  // if pokemon was updated
+  if ((item['encounter_id'] in mapData.pokemons) && isPokemonVisible(item) &&
+      (mapData.pokemons[item['encounter_id']]['individual_attack'] == null) &&
+      (item['individual_attack'] != null)) {
+    pokemon_list = {}
+    pokemon_list[item['encounter_id']] = item
+    mapData.pokemons[item['encounter_id']] = item
+    redrawPokemon(pokemon_list)
   }
 }
 
