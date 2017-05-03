@@ -1134,6 +1134,9 @@ function processPokemons (i, item) {
         ((item['encounter_id'] in mapData.pokemons) &&
          (mapData.pokemons[item['encounter_id']]['individual_attack'] == null) &&
          (item['individual_attack'] != null)))) {
+      if (item['encounter_id'] in mapData.pokemons) {
+        removePokemonMarker(item['encounter_id'])
+      }
       // add marker to map and item to dict
       if (item.marker) {
         item.marker.setMap(null)
