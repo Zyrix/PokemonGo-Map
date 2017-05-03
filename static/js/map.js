@@ -1150,9 +1150,13 @@ function processPokemons (i, item) {
   if ((item['encounter_id'] in mapData.pokemons) && isPokemonVisible(item) &&
       (mapData.pokemons[item['encounter_id']]['individual_attack'] == null) &&
       (item['individual_attack'] != null)) {
+    mapData.pokemons[item['encounter_id']]['individual_attack'] = item['individual_attack']
+    mapData.pokemons[item['encounter_id']]['individual_defense'] = item['individual_defense']
+    mapData.pokemons[item['encounter_id']]['individual_stamina'] = item['individual_stamina']
+    mapData.pokemons[item['encounter_id']]['move_1'] = item['move_1']
+    mapData.pokemons[item['encounter_id']]['move_2'] = item['move_2']
     var pokemon_list = {}
-    pokemon_list[item['encounter_id']] = item
-    mapData.pokemons[item['encounter_id']] = item
+    pokemon_list[item['encounter_id']] = mapData.pokemons[item['encounter_id']]
     redrawPokemon(pokemon_list)
   }
 }
