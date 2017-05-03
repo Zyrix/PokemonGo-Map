@@ -637,6 +637,39 @@ function getNotifyText(item) {
     }
 }
 
+function updatePokemonMarker (marker, item) {
+  marker.infoWindow.setContent(pokemonLabel(item['pokemon_name'], item['pokemon_rarity'], item['pokemon_types'], item['disappear_time'], item['pokemon_id'], item['latitude'], item['longitude'], item['encounter_id'], item['individual_attack'], item['individual_defense'], item['individual_stamina'], item['move_1'], item['move_2'], item['weight'], item['height'], item['gender']))
+
+  if (item['individual_attack'] != null) {
+    var perfection = getIv(item['individual_attack'], item['individual_defense'], item['individual_stamina'])
+    if (notifiedMinPerfection > 0 && perfection >= notifiedMinPerfection) {
+      if (Store.get('playSound')) {
+        audio.play()
+      }
+      sendNotification(getNotifyText(item).fav_title, getNotifyText(item).fav_text, 'static/icons/' + item['pokemon_id'] + '.png', item['latitude'], item['longitude'])
+      if (marker.animationDisabled !== true) {
+        marker.setAnimation(google.maps.Animation.BOUNCE)
+      }
+    }
+  }
+
+  if (((Store.get('notifyMedalMagikarp') && item['pokemon_id'] === 129) || (Store.get('notifyMedalRattata') && item['pokemon_id'] === 19)) && isMedalPokemon(item)) {
+    if (Store.get('playSound')) {
+      audio.play()
+    }
+    if (item['pokemon_id'] === 129) {
+      var sizeText = 'XL'
+    } else if (item['pokemon_id'] === 19) {
+      var sizeText = 'XS'
+    }
+
+    sendNotification(item['pokemon_name'] + ' ' + sizeText + ' (' + Math.round((item['weight'] + 0.00001) * 100) / 100 + 'kg)', getNotifyText(item).fav_text, 'static/icons/' + 'hat.png', item['latitude'], item['longitude'])
+    if (marker.animationDisabled !== true) {
+      marker.setAnimation(google.maps.Animation.BOUNCE)
+    }
+  }
+}
+
 function customizePokemonMarker (marker, item, skipNotification) {
   marker.addListener('click', function () {
     this.setAnimation(null)
@@ -1155,9 +1188,10 @@ function processPokemons (i, item) {
     mapData.pokemons[item['encounter_id']]['individual_stamina'] = item['individual_stamina']
     mapData.pokemons[item['encounter_id']]['move_1'] = item['move_1']
     mapData.pokemons[item['encounter_id']]['move_2'] = item['move_2']
-    var pokemon_list = {}
-    pokemon_list[item['encounter_id']] = mapData.pokemons[item['encounter_id']]
-    redrawPokemon(pokemon_list)
+    //var pokemon_list = {}
+    //pokemon_list[item['encounter_id']] = mapData.pokemons[item['encounter_id']]
+    //redrawPokemon(pokemon_list)
+    updatePokemonMarker(item.marker, item)
   }
 }
 
