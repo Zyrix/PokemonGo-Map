@@ -1130,7 +1130,10 @@ function processPokemons (i, item) {
     return false // in case the checkbox was unchecked in the meantime.
   }
 
-  if (!(item['encounter_id'] in mapData.pokemons) && isPokemonVisible(item)) {
+  if (isPokemonVisible(item) && (!(item['encounter_id'] in mapData.pokemons) ||
+        ((item['encounter_id'] in mapData.pokemons) &&
+         (mapData.pokemons[item['encounter_id']]['individual_attack'] == null) &&
+         (item['individual_attack'] != null)))) {
       // add marker to map and item to dict
       if (item.marker) {
         item.marker.setMap(null)
