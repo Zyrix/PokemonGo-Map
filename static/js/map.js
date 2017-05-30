@@ -671,7 +671,7 @@ function updatePokemonMarker (marker, item) {
       if (Store.get('playSound')) {
         audio.play()
       }
-      sendNotification(getNotifyText(item).fav_title, getNotifyText(item).fav_text, 'static/icons/' + item['pokemon_id'] + '.png', item['latitude'], item['longitude'])
+      sendNotification(getNotifyText(item).fav_title, getNotifyText(item).fav_text, 'static/icons/' + item['pokemon_id'] + '.png', item['latitude'], item['longitude'], item['encounter_id'])
       if (marker.animationDisabled !== true) {
         marker.setAnimation(google.maps.Animation.BOUNCE)
       }
@@ -688,7 +688,7 @@ function updatePokemonMarker (marker, item) {
       var sizeText = 'XS'
     }
 
-    sendNotification(item['pokemon_name'] + ' ' + sizeText + ' (' + Math.round((item['weight'] + 0.00001) * 100) / 100 + 'kg)', getNotifyText(item).fav_text, 'static/icons/' + 'hat.png', item['latitude'], item['longitude'])
+    sendNotification(item['pokemon_name'] + ' ' + sizeText + ' (' + Math.round((item['weight'] + 0.00001) * 100) / 100 + 'kg)', getNotifyText(item).fav_text, 'static/icons/' + 'hat.png', item['latitude'], item['longitude'], item['encounter_id'])
     if (marker.animationDisabled !== true) {
       marker.setAnimation(google.maps.Animation.BOUNCE)
     }
@@ -715,7 +715,7 @@ function customizePokemonMarker (marker, item, skipNotification) {
       if (Store.get('playSound')) {
         audio.play()
       }
-      sendNotification(getNotifyText(item).fav_title, getNotifyText(item).fav_text, 'static/icons/' + item['pokemon_id'] + '.png', item['latitude'], item['longitude'])
+      sendNotification(getNotifyText(item).fav_title, getNotifyText(item).fav_text, 'static/icons/' + item['pokemon_id'] + '.png', item['latitude'], item['longitude'], item['encounter_id'])
     }
     if (marker.animationDisabled !== true) {
       marker.setAnimation(google.maps.Animation.BOUNCE)
@@ -730,7 +730,7 @@ function customizePokemonMarker (marker, item, skipNotification) {
           audio.play()
 
         }
-        sendNotification(getNotifyText(item).fav_title, getNotifyText(item).fav_text, 'static/icons/' + item['pokemon_id'] + '.png', item['latitude'], item['longitude'])
+        sendNotification(getNotifyText(item).fav_title, getNotifyText(item).fav_text, 'static/icons/' + item['pokemon_id'] + '.png', item['latitude'], item['longitude'], item['encounter_id'])
       }
       if (marker.animationDisabled !== true) {
         marker.setAnimation(google.maps.Animation.BOUNCE)
@@ -749,7 +749,7 @@ function customizePokemonMarker (marker, item, skipNotification) {
         var sizeText = 'XS'
       }
 
-      sendNotification(item['pokemon_name'] + ' ' + sizeText + ' (' + Math.round((item['weight'] + 0.00001) * 100) / 100 + 'kg)', getNotifyText(item).fav_text, 'static/icons/' + 'hat.png', item['latitude'], item['longitude'])
+      sendNotification(item['pokemon_name'] + ' ' + sizeText + ' (' + Math.round((item['weight'] + 0.00001) * 100) / 100 + 'kg)', getNotifyText(item).fav_text, 'static/icons/' + 'hat.png', item['latitude'], item['longitude'], item['encounter_id'])
     }
     if (marker.animationDisabled !== true) {
       marker.setAnimation(google.maps.Animation.BOUNCE)
@@ -790,6 +790,10 @@ function setupGymMarker (item) {
     })
 
     google.maps.event.addListener(marker.infoWindow, 'closeclick', function () {
+      marker.persist = null
+    })
+
+    google.maps.event.addListener(marker.infoWindow, 'click', function () {
       marker.persist = null
     })
 
@@ -1553,7 +1557,7 @@ function getPointDistance (pointA, pointB) {
   return google.maps.geometry.spherical.computeDistanceBetween(pointA, pointB)
 }
 
-function sendNotification (title, text, icon, lat, lng) {
+function sendNotification (title, text, icon, lat, lng, encounterId) {
   if (!('Notification' in window)) {
     return false // Notifications are not present in browser
   }
@@ -1572,6 +1576,7 @@ function sendNotification (title, text, icon, lat, lng) {
       notification.close()
 
       centerMap(lat, lng, 15)
+      google.maps.event.trigger(mapData.pokemons[encounterId].marker, 'click');
     }
   }
 }
