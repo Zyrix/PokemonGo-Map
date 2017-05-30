@@ -225,6 +225,10 @@ function initMap () { // eslint-disable-line no-unused-vars
     redrawPokemon(mapData.lurePokemons)
   })
 
+  map.addListener('click', function () {
+    closeInfoWindows(mapData.pokemons)
+  })
+
   locationMarker = createLocationMarker()
   createMyLocationButton()
   initSidebar()
@@ -1491,6 +1495,15 @@ function drawScanPath (points) { // eslint-disable-line no-unused-vars
     strokeOpacity: 1.0,
     strokeWeight: 2,
     map: map
+  })
+}
+
+function closeInfoWindows (pokemonList) {
+  $.each(pokemonList, function (key, value) {
+    var item = pokemonList[key]
+    item.marker.persist = null
+    item.marker.infoWindow.close()
+    item.marker.infoWindowIsOpen = false
   })
 }
 
