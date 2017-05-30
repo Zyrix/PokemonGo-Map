@@ -638,6 +638,31 @@ function getNotifyText(item) {
 }
 
 function updatePokemonMarker (marker, item) {
+  var iv = 0
+  if ('individual_attack' in item) {
+    iv = (item['individual_attack'] + item['individual_defense'] + item['individual_stamina']) / 45.0 * 100
+  }
+
+  // Scale icon size up with the map exponentially
+  var iconSize = 2 + (map.getZoom() - 3) * (map.getZoom() - 3) * 0.2 + Store.get('iconSizeModifier')
+
+  // Display Pokémon with high IV bigger
+  if (iv >= perfectionLimit) {
+    iconSize *= 2
+  }
+
+  var pokemonIndex = item['pokemon_id'] - 1
+
+  // Display big Magikarps different
+  if (item['pokemon_id'] == 129 && isMedalPokemon(item)) {
+    pokemonIndex = 251
+  }
+
+  var sprite = pokemonSprites['gen2']
+  var icon = getGoogleSprite(pokemonIndex, sprite, iconSize)
+
+  marker.setIcon(icon)
+  marker.set('labelAnchor', new google.maps.Point(13, -iconSize / 2.4))
   marker.infoWindow.setContent(pokemonLabel(item['pokemon_name'], item['pokemon_rarity'], item['pokemon_types'], item['disappear_time'], item['pokemon_id'], item['latitude'], item['longitude'], item['encounter_id'], item['individual_attack'], item['individual_defense'], item['individual_stamina'], item['move_1'], item['move_2'], item['weight'], item['height'], item['gender']))
 
   if (item['individual_attack'] != null) {
@@ -1164,10 +1189,6 @@ function processPokemons (i, item) {
   }
 
   if (!(item['encounter_id'] in mapData.pokemons) && isPokemonVisible(item)) {
-      // remove marker if it was already here (eg without IV)
-      if (item['encounter_id'] in mapData.pokemons) {
-        removePokemonMarker(item['encounter_id'])
-      }
       // add marker to map and item to dict
       if (item.marker) {
         item.marker.setMap(null)
@@ -1188,10 +1209,7 @@ function processPokemons (i, item) {
     mapData.pokemons[item['encounter_id']]['individual_stamina'] = item['individual_stamina']
     mapData.pokemons[item['encounter_id']]['move_1'] = item['move_1']
     mapData.pokemons[item['encounter_id']]['move_2'] = item['move_2']
-    //var pokemon_list = {}
-    //pokemon_list[item['encounter_id']] = mapData.pokemons[item['encounter_id']]
-    //redrawPokemon(pokemon_list)
-    updatePokemonMarker(item.marker, item)
+    updatePokemonMarker(mapData.pokemons[item['encounter_id']].marker, item)
   }
 }
 
