@@ -1903,6 +1903,14 @@ function showGymDetails (id) { // eslint-disable-line no-unused-vars
       `
     }
 
+    pokemonHtml += `
+    <center>
+      <div style="font-size: .7em;">
+        ID: ${id}
+      </div>
+    </center>
+    `
+
     sidebar.innerHTML = `${headerHtml}${pokemonHtml}`
 
     sidebarClose = document.createElement('a')
