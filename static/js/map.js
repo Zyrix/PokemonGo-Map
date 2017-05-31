@@ -1809,7 +1809,7 @@ function showGymDetails (id) { // eslint-disable-line no-unused-vars
           Aktualisierung: ${lastScannedDateStr}
         </div>
         <div style="font-size: .7em;">
-          Aktualisierung: ${lastModifiedDateStr}
+          Änderung: ${lastModifiedDateStr}
         </div>
         <div>
           <a href='javascript:void(0);' onclick='javascript:openMapDirections(${result.latitude},${result.longitude});' title='Auf Karte anzeigen'>Navigation</a>
