@@ -2249,7 +2249,7 @@ def parse_map(args, map_dict, step_location, db_update_queue, wh_update_queue,
                         'last_modified': f['last_modified_timestamp_ms']
                     }))
 
-                log.info('Gym Info: ' + f)
+                print f
 
                 gyms[f['id']] = {
                     'gym_id': f['id'],
