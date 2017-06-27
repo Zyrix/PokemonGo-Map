@@ -2270,9 +2270,9 @@ def parse_map(args, map_dict, step_location, db_update_queue, wh_update_queue,
                         'gym_id': f['id'],
                         'raid_level': r['raid_level'],
                         'raid_pokemon': pokemon_id,
-                        'raid_spawn': r['raid_spawn_ms'],
-                        'raid_battle': r['raid_battle_ms'],
-                        'raid_end': r['raid_end_ms'],
+                        'raid_spawn': datetime.utcfromtimestamp(r['raid_spawn_ms'] / 1000.0),
+                        'raid_battle': datetime.utcfromtimestamp(r['raid_battle_ms'] / 1000.0),
+                        'raid_end': datetime.utcfromtimestamp(r['raid_end_ms'] / 1000.0),
                     }
 
                 gyms[f['id']] = {
