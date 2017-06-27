@@ -542,7 +542,6 @@ class Pokestop(BaseModel):
 
 
 class Gym(BaseModel):
-
     gym_id = Utf8mb4CharField(primary_key=True, max_length=50)
     team_id = SmallIntegerField()
     guard_pokemon_id = SmallIntegerField()
@@ -708,6 +707,16 @@ class Gym(BaseModel):
             result['pokemon'].append(p)
 
         return result
+
+
+class Raid(BaseModel):
+    raid_seed = Utf8mb4CharField(primary_key=True, max_length=50)
+    gym_id = Utf8mb4CharField(max_length=50)
+    raid_level = SmallIntegerField()
+    raid_pokemon = SmallIntegerField()
+    raid_spawn = DateTimeField(index=True)
+    raid_battle = DateTimeField(index=True)
+    raid_end = DateTimeField(index=True)
 
 
 class LocationAltitude(BaseModel):
@@ -1773,6 +1782,7 @@ def parse_map(args, map_dict, step_location, db_update_queue, wh_update_queue,
     pokemon = {}
     pokestops = {}
     gyms = {}
+    raids = {}
     skipped = 0
     stopsskipped = 0
     forts = []
@@ -2249,7 +2259,21 @@ def parse_map(args, map_dict, step_location, db_update_queue, wh_update_queue,
                         'last_modified': f['last_modified_timestamp_ms']
                     }))
 
-                print f
+                if 'raid_info' in f:
+                    r = f['raid_info']
+                    pokemon_id = 0
+                    if 'raid_pokemon' in r:
+                        pokemon_id = r['raid_pokemon']['pokemon_id']
+
+                    raids[r['raid_seed']] = {
+                        'raid_seed': r['raid_seed'],
+                        'gym_id': f['id'],
+                        'raid_level': r['raid_level'],
+                        'raid_pokemon': pokemon_id,
+                        'raid_spawn': r['raid_spawn'],
+                        'raid_battle': r['raid_battle'],
+                        'raid_end': r['raid_end'],
+                    }
 
                 gyms[f['id']] = {
                     'gym_id': f['id'],
@@ -2322,6 +2346,8 @@ def parse_map(args, map_dict, step_location, db_update_queue, wh_update_queue,
         db_update_queue.put((Pokestop, pokestops))
     if gyms:
         db_update_queue.put((Gym, gyms))
+    if raids:
+        db_update_queue.put((Raid, raids))
     if spawn_points:
         db_update_queue.put((SpawnPoint, spawn_points))
         db_update_queue.put((ScanSpawnPoint, scan_spawn_points))
@@ -2631,7 +2657,7 @@ def bulk_upsert(cls, data, db):
 
 def create_tables(db):
     db.connect()
-    tables = [Pokemon, Pokestop, Gym, ScannedLocation, GymDetails,
+    tables = [Pokemon, Pokestop, Gym, Raid, ScannedLocation, GymDetails,
               GymMember, GymPokemon, Trainer, MainWorker, WorkerStatus,
               SpawnPoint, ScanSpawnPoint, SpawnpointDetectionData,
               Token, LocationAltitude, HashKeys]
@@ -2645,7 +2671,7 @@ def create_tables(db):
 
 
 def drop_tables(db):
-    tables = [Pokemon, Pokestop, Gym, ScannedLocation, Versions,
+    tables = [Pokemon, Pokestop, Gym, Raid, ScannedLocation, Versions,
               GymDetails, GymMember, GymPokemon, Trainer, MainWorker,
               WorkerStatus, SpawnPoint, ScanSpawnPoint,
               SpawnpointDetectionData, LocationAltitude,
