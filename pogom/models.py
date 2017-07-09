@@ -841,7 +841,7 @@ class Gym(BaseModel):
                    .join(Trainer, on=(GymPokemon.trainer_name == Trainer.name))
                    .where(GymMember.gym_id == id)
                    .where(GymMember.last_scanned > Gym.last_modified)
-                   .order_by(GymPokemon.cp_decayed.desc())
+                   .order_by(GymMember.cp_decayed.desc())
                    .distinct()
                    .dicts())
 
