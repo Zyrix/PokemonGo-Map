@@ -1601,6 +1601,8 @@ class GymMember(BaseModel):
     gym_id = CharField(index=True)
     pokemon_uid = CharField()
     last_scanned = DateTimeField(default=datetime.utcnow)
+    deployment_time = DateTimeField()
+    cp_decayed = SmallIntegerField()
 
     class Meta:
         primary_key = False
