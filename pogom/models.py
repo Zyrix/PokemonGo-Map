@@ -12,7 +12,7 @@ import geopy
 import math
 from peewee import SqliteDatabase, InsertQuery, \
     Check, CompositeKey, ForeignKeyField, \
-    IntegerField, CharField, DoubleField, BooleanField, \
+    SmallIntegerField, IntegerField, CharField, DoubleField, BooleanField, \
     DateTimeField, fn, DeleteQuery, FloatField, SQL, TextField, JOIN
 from playhouse.flask_utils import FlaskDB
 from playhouse.pool import PooledMySQLDatabase
@@ -691,10 +691,11 @@ class Gym(BaseModel):
     gym_id = CharField(primary_key=True, max_length=50)
     team_id = IntegerField()
     guard_pokemon_id = IntegerField()
-    gym_points = IntegerField()
+    slots_available = SmallIntegerField()
     enabled = BooleanField()
     latitude = DoubleField()
     longitude = DoubleField()
+    total_cp = SmallIntegerField()
     last_modified = DateTimeField(index=True)
     last_scanned = DateTimeField(default=datetime.utcnow)
 
@@ -765,6 +766,8 @@ class Gym(BaseModel):
                        .select(
                            GymMember.gym_id,
                            GymPokemon.cp.alias('pokemon_cp'),
+                           GymMember.cp_decayed,
+                           GymMember.deployment_time,
                            GymPokemon.pokemon_id,
                            Trainer.name.alias('trainer_name'),
                            Trainer.level.alias('trainer_level'))
@@ -773,7 +776,6 @@ class Gym(BaseModel):
                        .join(Trainer, on=(GymPokemon.trainer_name == Trainer.name))
                        .where(GymMember.gym_id << gym_ids)
                        .where(GymMember.last_scanned > Gym.last_modified)
-                       .order_by(GymMember.gym_id, GymPokemon.cp)
                        .dicts())
 
             for p in pokemon:
@@ -798,27 +800,33 @@ class Gym(BaseModel):
 
     @staticmethod
     def get_gym(id):
-        result = (Gym
-                  .select(Gym.gym_id,
-                          Gym.team_id,
-                          GymDetails.name,
-                          GymDetails.description,
-                          Gym.guard_pokemon_id,
-                          Gym.gym_points,
-                          Gym.latitude,
-                          Gym.longitude,
-                          Gym.last_modified,
-                          Gym.last_scanned)
-                  .join(GymDetails, JOIN.LEFT_OUTER, on=(Gym.gym_id == GymDetails.gym_id))
-                  .where(Gym.gym_id == id)
-                  .dicts()
-                  .get())
+        try:
+            result = (Gym
+                      .select(Gym.gym_id,
+                              Gym.team_id,
+                              GymDetails.name,
+                              GymDetails.description,
+                              Gym.guard_pokemon_id,
+                              Gym.slots_available,
+                              Gym.latitude,
+                              Gym.longitude,
+                              Gym.last_modified,
+                              Gym.last_scanned)
+                      .join(GymDetails, JOIN.LEFT_OUTER,
+                            on=(Gym.gym_id == GymDetails.gym_id))
+                      .where(Gym.gym_id == id)
+                      .dicts()
+                      .get())
+        except Gym.DoesNotExist:
+            return None
 
         result['guard_pokemon_name'] = get_pokemon_name(result['guard_pokemon_id']) if result['guard_pokemon_id'] else ''
         result['pokemon'] = []
 
         pokemon = (GymMember
                    .select(GymPokemon.cp.alias('pokemon_cp'),
+                           GymMember.cp_decayed,
+                           GymMember.deployment_time,
                            GymPokemon.pokemon_id,
                            GymPokemon.pokemon_uid,
                            GymPokemon.move_1,
@@ -833,7 +841,7 @@ class Gym(BaseModel):
                    .join(Trainer, on=(GymPokemon.trainer_name == Trainer.name))
                    .where(GymMember.gym_id == id)
                    .where(GymMember.last_scanned > Gym.last_modified)
-                   .order_by(GymPokemon.cp.desc())
+                   .order_by(GymPokemon.cp_decayed.desc())
                    .distinct()
                    .dicts())
 
