@@ -1305,7 +1305,7 @@ function updatePokestops () {
 }
 
 function processGyms(i, item) {
-    var gymLevel = item.pokemon.length
+    var gymLevel = getGymLevel(item)
     if (!Store.get('showGyms')) {
         return false // in case the checkbox was unchecked in the meantime.
     }
@@ -1321,7 +1321,7 @@ function processGyms(i, item) {
     }
 
     if (Store.get('showOpenGymsOnly')) {
-        if (item.pokemon.length === 6) {
+        if (item.slots_available === 0) {
             removeGymFromMap(item['gym_id'])
             return true
         }
