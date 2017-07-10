@@ -581,6 +581,10 @@ function getIv(atk, def, stm) {
     return false
 }
 
+function getGymLevel(gym) {
+  return 6 - gym['slots_available']
+}
+
 function lpad(str, len, padstr) {
     return Array(Math.max(len - String(str).length + 1, 0)).join(padstr) + str
 }
@@ -622,8 +626,10 @@ function getNotifyText(item) {
         item['individual_defense'], item['individual_stamina']]
     var ntitle = repArray(((iv) ? notifyIvTitle : notifyNoIvTitle), find, replace)
     var dist = (new Date(item['disappear_time'])).toLocaleString([], {
-        hour: '2-digit', minute: '2-digit',
-        second: '2-digit', hour12: false})
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false})
     var until = getTimeUntil(item['disappear_time'])
     var udist = (until.hour > 0) ? until.hour + ':' : ''
     udist += lpad(until.min, 2, 0) + 'm' + lpad(until.sec, 2, 0) + 's'
@@ -767,7 +773,7 @@ function setupGymMarker (item) {
     },
     map: map,
     icon: {
-      url: 'static/forts/' + Store.get('gymMarkerStyle') + '/' + gymTypes[item['team_id']] + (item['pokemon'].length !== 0 ? '_' + item['pokemon'].length : '') + '.png',
+      url: 'static/forts/' + Store.get('gymMarkerStyle') + '/' + gymTypes[item['team_id']] + '_' + getGymLevel(item) + '.png',
       scaledSize: new google.maps.Size(48, 48)
     }
   })
@@ -821,16 +827,18 @@ function setupGymMarker (item) {
 
 function updateGymMarker (item, marker) {
   marker.setIcon({
-    url: 'static/forts/' + Store.get('gymMarkerStyle') + '/' + gymTypes[item['team_id']] + (item['pokemon'].length !== 0 ? '_' + item['pokemon'].length : '') + '.png',
+    url: 'static/forts/' + Store.get('gymMarkerStyle') + '/' + gymTypes[item['team_id']] + '_' + getGymLevel(item) + '.png',
     scaledSize: new google.maps.Size(48, 48)
   })
   marker.infoWindow.setContent(gymLabel(gymTypes[item['team_id']], item['team_id'], item['gym_points'], item['latitude'], item['longitude'], item['last_scanned'], item['last_modified'], item['name'], item['pokemon'], item['gym_id']))
   return marker
 }
+
 function updateGymIcons () {
   $.each(mapData.gyms, function (key, value) {
-    mapData.gyms[key]['marker'].setIcon({
-      url: 'static/forts/' + Store.get('gymMarkerStyle') + '/' + gymTypes[mapData.gyms[key]['team_id']] + (mapData.gyms[key]['pokemon'].length !== 0 ? '_' + mapData.gyms[key]['pokemon'].length : '') + '.png',
+    var item = mapData.gyms[key]
+    item['marker'].setIcon({
+      url: 'static/forts/' + Store.get('gymMarkerStyle') + '/' + gymTypes[item['team_id']] + '_' + getGymLevel(item) + '.png',
       scaledSize: new google.maps.Size(48, 48)
     })
   })
