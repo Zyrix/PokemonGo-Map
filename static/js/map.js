@@ -1744,10 +1744,10 @@ function showGymDetails (id) { // eslint-disable-line no-unused-vars
   data.done(function (result) {
     var lastScannedDateStr = getDateStr(result.last_scanned)
     var lastModifiedDateStr = getDateStr(result.last_modified)
-    var freeSlots = 6 - result.pokemon.length
+    var freeSlots = result.slots_available
     var gymLevelStr = ''
 
-    if (result.team_id !== 0 && result.pokemon.length !== 0) {
+    if (result.team_id !== 0 && result.slots_available > 0) {
       gymLevelStr = `<div>
         <b>${freeSlots} Freie Plätze</b>
       </div>`
