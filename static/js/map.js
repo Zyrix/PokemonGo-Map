@@ -892,11 +892,13 @@ function updateGymMarker (item, marker) {
     marker.setIcon({
       url: 'static/raids/level_' + item['raid']['level'] + '.png',
       scaledSize: new google.maps.Size(48, 48)
+    })
   } else {
     marker.setIcon({
       url: 'static/forts/' + Store.get('gymMarkerStyle') + '/' + gymTypes[item['team_id']] + '_' + getGymLevel(item) + '.png',
       scaledSize: new google.maps.Size(48, 48)
     })
+    marker.setZIndex(1)
   }
   marker.infoWindow.setContent(gymLabel(gymTypes[item['team_id']], item['team_id'], item['gym_points'], item['latitude'], item['longitude'], item['last_scanned'], item['last_modified'], item['name'], item['pokemon'], item['gym_id'], item['raid']))
   return marker
