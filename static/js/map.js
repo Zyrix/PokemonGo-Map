@@ -398,7 +398,7 @@ function pokemonLabel (name, rarity, types, disappearTime, id, latitude, longitu
   return contentstring
 }
 
-function gymLabel (teamName, teamId, gymPoints, latitude, longitude, lastScanned = null, lastModified = null, name = null, members = [], gymId, raid) {
+function gymLabel (teamName, teamId, gymPoints, latitude, longitude, lastScanned = null, lastModified = null, name = null, members = [], gymId, level, raid) {
   var memberStr = ''
   for (var i = 0; i < members.length; i++) {
     memberStr += `
@@ -434,16 +434,20 @@ function gymLabel (teamName, teamId, gymPoints, latitude, longitude, lastScanned
     str = `
       <div>
         <center>
-          <div style='padding-bottom: 2px'>
-            Arena gehört:
-          </div>
           <div>
             <b style='color:rgba(${gymColor[teamId]})'>Team ${teamName}</b><br>
             <img height='70px' style='padding: 5px;' src='static/forts/${teamName}_large.png'>
           </div>
           <div>
             ${nameStr}
-          </div>
+          </div>`
+    if (members.length == 0) {
+      str += `
+          <div>
+            Level ${level}
+          </div>`
+    }
+    str += `
           <div>
             ${memberStr}
           </div>`
@@ -860,7 +864,7 @@ function updateGymMarker (item, marker) {
     })
     marker.setZIndex(1)
   }
-  marker.infoWindow.setContent(gymLabel(gymTypes[item['team_id']], item['team_id'], item['gym_points'], item['latitude'], item['longitude'], item['last_scanned'], item['last_modified'], item['name'], item['pokemon'], item['gym_id'], item['raid']))
+  marker.infoWindow.setContent(gymLabel(gymTypes[item['team_id']], item['team_id'], item['gym_points'], item['latitude'], item['longitude'], item['last_scanned'], item['last_modified'], item['name'], item['pokemon'], item['gym_id'], getGymLevel(item), item['raid']))
   return marker
 }
 
