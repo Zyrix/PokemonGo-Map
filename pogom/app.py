@@ -252,14 +252,6 @@ class Pogom(Flask):
                 if newArea:
                     d['spawnpoints'] = d['spawnpoints'] + (Pokemon.get_spawnpoints(swLat, swLng, neLat, neLng, oSwLat=oSwLat, oSwLng=oSwLng, oNeLat=oNeLat, oNeLng=oNeLng))
 
-        if request.args.get('status', 'false') == 'true':
-            args = get_args()
-            d = {}
-            if args.status_page_password is None:
-                d['error'] = 'Access denied'
-            elif request.args.get('password', None) == args.status_page_password:
-                d['main_workers'] = MainWorker.get_all()
-                d['workers'] = WorkerStatus.get_all()
         return jsonify(d)
 
     def loc(self):
@@ -380,27 +372,6 @@ class Pogom(Flask):
         gym = Gym.get_gym(gym_id)
 
         return jsonify(gym)
-
-    def get_status(self):
-        args = get_args()
-        if args.status_page_password is None:
-            abort(404)
-
-        return render_template('status.html')
-
-    def post_status(self):
-        args = get_args()
-        d = {}
-        if args.status_page_password is None:
-            abort(404)
-
-        if request.form.get('password', None) == args.status_page_password:
-            d['login'] = 'ok'
-            d['main_workers'] = MainWorker.get_all()
-            d['workers'] = WorkerStatus.get_all()
-        else:
-            d['login'] = 'failed'
-        return jsonify(d)
 
 
 class CustomJSONEncoder(JSONEncoder):
