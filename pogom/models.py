@@ -5,7 +5,6 @@ import logging
 import itertools
 import calendar
 import sys
-import traceback
 import gc
 import time
 import geopy
@@ -42,6 +41,13 @@ class MyRetryDB(RetryOperationalError, PooledMySQLDatabase):
     pass
 
 
+# Reduction of CharField to fit max length inside 767 bytes for utf8mb4 charset
+class Utf8mb4CharField(CharField):
+    def __init__(self, max_length=191, *args, **kwargs):
+        self.max_length = max_length
+        super(CharField, self).__init__(*args, **kwargs)
+
+
 def init_database(app):
     if args.db_type == 'mysql':
         log.info('Connecting to MySQL database on %s:%i', args.db_host, int(args.db_port))
@@ -55,7 +61,9 @@ def init_database(app):
             host=args.db_host,
             port=int(args.db_port),
             max_connections=connections,
-            stale_timeout=300)
+            stale_timeout=300,
+            charset='utf8mb4'
+        )
     else:
         log.info('Connecting to local SQLite database')
         db = SqliteDatabase(args.db)
@@ -285,8 +293,8 @@ class PokemonCurrent(BaseModel):
 class Pokemon(BaseModel):
     # We are base64 encoding the ids delivered by the api,
     # because they are too big for sqlite to handle.
-    encounter_id = CharField(primary_key=True, max_length=50)
-    spawnpoint_id = CharField(index=True)
+    encounter_id = Utf8mb4CharField(primary_key=True, max_length=50)
+    spawnpoint_id = Utf8mb4CharField(index=True)
     pokemon_id = IntegerField(index=True)
     latitude = DoubleField()
     longitude = DoubleField()
@@ -595,13 +603,13 @@ class Pokemon(BaseModel):
 
 
 class Pokestop(BaseModel):
-    pokestop_id = CharField(primary_key=True, max_length=50)
+    pokestop_id = Utf8mb4CharField(primary_key=True, max_length=50)
     enabled = BooleanField()
     latitude = DoubleField()
     longitude = DoubleField()
     last_modified = DateTimeField(index=True)
     lure_expiration = DateTimeField(null=True, index=True)
-    active_fort_modifier = CharField(max_length=50, null=True)
+    active_fort_modifier = Utf8mb4CharField(max_length=50, null=True, index=True)
     last_updated = DateTimeField(null=True, index=True, default=datetime.utcnow)
 
     class Meta:
@@ -688,7 +696,7 @@ class Gym(BaseModel):
     TEAM_VALOR = 2
     TEAM_INSTINCT = 3
 
-    gym_id = CharField(primary_key=True, max_length=50)
+    gym_id = Utf8mb4CharField(primary_key=True, max_length=50)
     team_id = IntegerField()
     guard_pokemon_id = IntegerField()
     slots_available = SmallIntegerField()
@@ -864,7 +872,7 @@ class Gym(BaseModel):
 
 
 class ScannedLocation(BaseModel):
-    cellid = CharField(primary_key=True, max_length=50)
+    cellid = Utf8mb4CharField(primary_key=True, max_length=50)
     latitude = DoubleField()
     longitude = DoubleField()
     last_modified = DateTimeField(index=True, default=datetime.utcnow, null=True)
@@ -1150,96 +1158,14 @@ class ScannedLocation(BaseModel):
         return in_hex
 
 
-class MainWorker(BaseModel):
-    worker_name = CharField(primary_key=True, max_length=50)
-    message = CharField()
-    method = CharField(max_length=50)
-    last_modified = DateTimeField(index=True)
-
-
-class WorkerStatus(BaseModel):
-    username = CharField(primary_key=True, max_length=50)
-    worker_name = CharField(index=True, max_length=50)
-    success = IntegerField()
-    fail = IntegerField()
-    no_items = IntegerField()
-    skip = IntegerField()
-    last_modified = DateTimeField(index=True)
-    message = CharField(max_length=255)
-    last_scan_date = DateTimeField(index=True)
-    latitude = DoubleField(null=True)
-    longitude = DoubleField(null=True)
-
-    @staticmethod
-    def db_format(status, name='status_worker_db'):
-        status['worker_name'] = status.get('worker_name', name)
-        return {'username': status['username'],
-                'worker_name': status['worker_name'],
-                'success': status['success'],
-                'fail': status['fail'],
-                'no_items': status['noitems'],
-                'skip': status['skip'],
-                'last_modified': datetime.utcnow(),
-                'message': status['message'],
-                'last_scan_date': status.get('last_scan_date', datetime.utcnow()),
-                'latitude': status.get('latitude', None),
-                'longitude': status.get('longitude', None)}
-
-    @staticmethod
-    def get_recent():
-        query = (WorkerStatus
-                 .select()
-                 .where((WorkerStatus.last_modified >=
-                        (datetime.utcnow() - timedelta(minutes=5))))
-                 .order_by(WorkerStatus.username)
-                 .dicts())
-
-        status = []
-        for s in query:
-            status.append(s)
-
-        return status
-
-    @staticmethod
-    def get_worker(username, loc=False):
-        query = (WorkerStatus
-                 .select()
-                 .where((WorkerStatus.username == username))
-                 .dicts())
-
-        # Sometimes is appears peewee is slow to load, and and this produces an Exception
-        # Retry after a second to give peewee time to load
-        while True:
-            try:
-                result = query[0] if len(query) else {
-                    'username': username,
-                    'success': 0,
-                    'fail': 0,
-                    'no_items': 0,
-                    'skip': 0,
-                    'last_modified': datetime.utcnow(),
-                    'message': 'New account {} loaded'.format(username),
-                    'last_scan_date': datetime.utcnow(),
-                    'latitude': loc[0] if loc else None,
-                    'longitude': loc[1] if loc else None
-                }
-                break
-            except Exception as e:
-                log.error('Exception in get_worker under account {} Exception message: {}'.format(username, e))
-                traceback.print_exc(file=sys.stdout)
-                time.sleep(1)
-
-        return result
-
-
 class SpawnPoint(BaseModel):
-    id = CharField(primary_key=True, max_length=50)
+    id = Utf8mb4CharField(primary_key=True, max_length=50)
     latitude = DoubleField()
     longitude = DoubleField()
     last_scanned = DateTimeField(index=True)
     # kind gives the four quartiles of the spawn, as 's' for seen or 'h' for hidden
     # for example, a 30 minute spawn is 'hhss'
-    kind = CharField(max_length=4, default='hhhs')
+    kind = Utf8mb4CharField(max_length=4, default='hhhs')
 
     # links shows whether a pokemon encounter id changes between quartiles or stays the same
     # both 1x45 and 1x60h3 have the kind of 'sssh', but the different links shows when the
@@ -1249,7 +1175,7 @@ class SpawnPoint(BaseModel):
     # For the hidden times, an 'h' is used. Until determined, '?' is used.
     # Note index is shifted by a half. links[0] is the link between kind[0] and kind[1],
     # and so on. links[3] is the link between kind[3] and kind[0]
-    links = CharField(max_length=4, default='????')
+    links = Utf8mb4CharField(max_length=4, default='????')
 
     # count consecutive times spawn should have been seen, but wasn't
     # if too high, will not be scheduled for review, and treated as inactive
@@ -1408,9 +1334,9 @@ class ScanSpawnPoint(BaseModel):
 
 
 class SpawnpointDetectionData(BaseModel):
-    id = CharField(primary_key=True, max_length=54)
-    encounter_id = CharField(max_length=54)  # removed ForeignKeyField since it caused MySQL issues
-    spawnpoint_id = CharField(max_length=54)  # removed ForeignKeyField since it caused MySQL issues
+    id = Utf8mb4CharField(primary_key=True, max_length=54)
+    encounter_id = Utf8mb4CharField(max_length=54)  # removed ForeignKeyField since it caused MySQL issues
+    spawnpoint_id = Utf8mb4CharField(max_length=54)  # removed ForeignKeyField since it caused MySQL issues
     scan_time = DateTimeField()
     tth_secs = IntegerField(null=True)
 
@@ -1590,7 +1516,7 @@ class SpawnpointDetectionData(BaseModel):
 
 
 class Versions(flaskDb.Model):
-    key = CharField()
+    key = Utf8mb4CharField()
     val = IntegerField()
 
     class Meta:
@@ -1598,8 +1524,8 @@ class Versions(flaskDb.Model):
 
 
 class GymMember(BaseModel):
-    gym_id = CharField(index=True)
-    pokemon_uid = CharField()
+    gym_id = Utf8mb4CharField(index=True)
+    pokemon_uid = Utf8mb4CharField()
     last_scanned = DateTimeField(default=datetime.utcnow)
     deployment_time = DateTimeField()
     cp_decayed = SmallIntegerField()
@@ -1609,10 +1535,10 @@ class GymMember(BaseModel):
 
 
 class GymPokemon(BaseModel):
-    pokemon_uid = CharField(primary_key=True, max_length=50)
+    pokemon_uid = Utf8mb4CharField(primary_key=True, max_length=50)
     pokemon_id = IntegerField()
     cp = IntegerField()
-    trainer_name = CharField()
+    trainer_name = Utf8mb4CharField()
     num_upgrades = IntegerField(null=True)
     move_1 = IntegerField(null=True)
     move_2 = IntegerField(null=True)
@@ -1629,17 +1555,17 @@ class GymPokemon(BaseModel):
 
 
 class Trainer(BaseModel):
-    name = CharField(primary_key=True, max_length=50)
+    name = Utf8mb4CharField(primary_key=True, max_length=50)
     team = IntegerField()
     level = IntegerField()
     last_seen = DateTimeField(default=datetime.utcnow)
 
 
 class GymDetails(BaseModel):
-    gym_id = CharField(primary_key=True, max_length=50)
-    name = CharField()
+    gym_id = Utf8mb4CharField(primary_key=True, max_length=50)
+    name = Utf8mb4CharField()
     description = TextField(null=True, default="")
-    url = CharField()
+    url = Utf8mb4CharField()
     last_scanned = DateTimeField(default=datetime.utcnow)
 
 
@@ -2120,41 +2046,6 @@ def db_updater(args, q, db):
             log.exception('Exception in db_updater: %s', e)
 
 
-def clean_db_loop(args):
-    while True:
-        try:
-            query = (MainWorker
-                     .delete()
-                     .where((ScannedLocation.last_modified <
-                             (datetime.utcnow() - timedelta(minutes=30)))))
-            query.execute()
-
-            query = (WorkerStatus
-                     .delete()
-                     .where((ScannedLocation.last_modified <
-                             (datetime.utcnow() - timedelta(minutes=30)))))
-            query.execute()
-
-            # Remove active modifier from expired lured pokestops.
-            query = (Pokestop
-                     .update(lure_expiration=None, active_fort_modifier=None)
-                     .where(Pokestop.lure_expiration < datetime.utcnow()))
-            query.execute()
-
-            # If desired, clear old pokemon spawns.
-            if args.purge_data > 0:
-                query = (Pokemon
-                         .delete()
-                         .where((Pokemon.disappear_time <
-                                (datetime.utcnow() - timedelta(hours=args.purge_data)))))
-                query.execute()
-
-            log.info('Regular database cleaning complete')
-            time.sleep(60)
-        except Exception as e:
-            log.exception('Exception in clean_db_loop: %s', e)
-
-
 def bulk_upsert(cls, data, db):
     num_rows = len(data.values())
     i = 0
@@ -2198,16 +2089,15 @@ def bulk_upsert(cls, data, db):
 
 def create_tables(db):
     db.connect()
-    verify_database_schema(db)
     db.create_tables([Pokemon, PokemonCurrent, Pokestop, Gym, ScannedLocation, GymDetails, GymMember, GymPokemon,
-                      Trainer, MainWorker, WorkerStatus, SpawnPoint, ScanSpawnPoint, SpawnpointDetectionData], safe=True)
+                      Trainer, SpawnPoint, ScanSpawnPoint, SpawnpointDetectionData], safe=True)
     db.close()
 
 
 def drop_tables(db):
     db.connect()
     db.drop_tables([Pokemon, PokemonCurrent, Pokestop, Gym, ScannedLocation, Versions, GymDetails, GymMember, GymPokemon,
-                    Trainer, MainWorker, WorkerStatus, SpawnPoint, ScanSpawnPoint, SpawnpointDetectionData, Versions], safe=True)
+                    Trainer, SpawnPoint, ScanSpawnPoint, SpawnpointDetectionData, Versions], safe=True)
     db.close()
 
 
@@ -2307,7 +2197,6 @@ def database_migrate(db, old_ver):
         # so drop and re-create with new schema
 
         db.drop_tables([ScannedLocation])
-        db.drop_tables([WorkerStatus])
 
     if old_ver < 11:
 
