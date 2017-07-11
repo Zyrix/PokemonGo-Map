@@ -30,11 +30,7 @@ class Pogom(Flask):
         self.route("/loc", methods=['GET'])(self.loc)
         self.route("/next_loc", methods=['POST'])(self.next_loc)
         self.route("/mobile", methods=['GET'])(self.list_pokemon)
-        self.route("/search_control", methods=['GET'])(self.get_search_control)
-        self.route("/search_control", methods=['POST'])(self.post_search_control)
         self.route("/stats", methods=['GET'])(self.get_stats)
-        self.route("/status", methods=['GET'])(self.get_status)
-        self.route("/status", methods=['POST'])(self.post_status)
 
         args = get_args()
         if args.version == 'full' or args.version == 'mystic':
