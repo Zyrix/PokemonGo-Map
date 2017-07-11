@@ -354,7 +354,7 @@ function getDateStr(t) {
 function getTimeStr(t) {
   var dateStr = 'Unknown'
   if (t) {
-    dateStr = moment(t).format('HH:mm:ss')
+    dateStr = moment(t).format('HH:mm')
   }
   return dateStr
 }
@@ -456,10 +456,10 @@ function gymLabel (teamName, teamId, gymPoints, latitude, longitude, lastScanned
     str += `
           <br>
           <div>
-            Raid Level: ${levelStr}
+            Raid: ${levelStr}
           </div>
           <div>
-            <div style="margin-bottom: 10px">Time: <b>${raidStartStr}</b> - <b>${raidEndsStr}</b></div>
+            <div style="margin-bottom: 10px"><b>${raidStartStr}</b> - <b>${raidEndsStr}</b></div>
           </div>`
     if (raid['pokemon_id'] !== null) {
       var types = raid['pokemon_types']
@@ -1862,7 +1862,7 @@ function showGymDetails (id) { // eslint-disable-line no-unused-vars
             Raid: ${levelStr}
           </div>
           <div>
-            <div style="margin-bottom: 10px">Time: <b>${raidStartStr}</b> - <b>${raidEndsStr}</b></div>
+            <div style="margin-bottom: 10px"><b>${raidStartStr}</b> - <b>${raidEndsStr}</b></div>
           </div>`
       if (raid['pokemon_id'] !== null) {
         var types = raid['pokemon_types']
