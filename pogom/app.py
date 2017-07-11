@@ -14,7 +14,7 @@ from datetime import timedelta
 from collections import OrderedDict
 
 from . import config
-from .models import Pokemon, PokemonCurrent, Gym, Pokestop, ScannedLocation, MainWorker, WorkerStatus
+from .models import Pokemon, PokemonCurrent, Gym, Pokestop, ScannedLocation
 from .utils import now
 log = logging.getLogger(__name__)
 compress = Compress()
