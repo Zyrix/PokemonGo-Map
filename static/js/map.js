@@ -807,41 +807,23 @@ function customizePokemonMarker (marker, item, skipNotification) {
 }
 
 function setupGymMarker (item) {
-  var marker
-  if (item['raid'] !== null && item['raid']['end'] > Date.now() && item['raid']['pokemon_id'] !== null) {
-    marker = new google.maps.Marker({
-      position: {
-        lat: item['latitude'],
-        lng: item['longitude']
-      },
-      map: map,
-      icon: {
-        url: 'static/icons/' + item['raid']['pokemon_id'] + '.png',
-        scaledSize: new google.maps.Size(48, 48)
-      }
-    })
-  } else {
-    marker = new google.maps.Marker({
-      position: {
-        lat: item['latitude'],
-        lng: item['longitude']
-      },
-      map: map,
-      icon: {
-        url: 'static/forts/' + Store.get('gymMarkerStyle') + '/' + gymTypes[item['team_id']] + '_' + getGymLevel(item) + '.png',
-        scaledSize: new google.maps.Size(48, 48)
-      }
-    })
-  }
+  var marker = new google.maps.Marker({
+    position: {
+      lat: item['latitude'],
+      lng: item['longitude']
+    },
+    map: map
+  })
+
+  marker.infoWindow = new google.maps.InfoWindow({
+    content: '',
+    disableAutoPan: true
+  })
+  updateGymMarker(item, marker)
 
   if (!marker.rangeCircle && isRangeActive(map)) {
     marker.rangeCircle = addRangeCircle(marker, map, 'gym', item['team_id'])
   }
-
-  marker.infoWindow = new google.maps.InfoWindow({
-    content: gymLabel(gymTypes[item['team_id']], item['team_id'], item['gym_points'], item['latitude'], item['longitude'], item['last_scanned'], item['last_modified'], item['name'], item['pokemon'], item['gym_id'], item['raid']),
-    disableAutoPan: true
-  })
 
   if (Store.get('useGymSidebar')) {
     marker.addListener('click', function () {
