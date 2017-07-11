@@ -456,39 +456,17 @@ function gymLabel (teamName, teamId, gymPoints, latitude, longitude, lastScanned
     str += `
           <br>
           <div>
-            Raid: ${levelStr}
-          </div>
-          <div>
-            <div style="margin-bottom: 10px"><b>${raidStartStr}</b> - <b>${raidEndsStr}</b></div>
+            <b>Raid</b>: <b>${raidStartStr}</b> - <b>${raidEndsStr}</b> (${levelStr})
           </div>`
     if (raid['pokemon_id'] !== null) {
-      var types = raid['pokemon_types']
-      var typesDisplay = ''
       var pMove1 = (moves[raid['move_1']] !== undefined) ? i8ln(moves[raid['move_1']]['name']) : 'gen/unknown'
       var pMove2 = (moves[raid['move_2']] !== undefined) ? i8ln(moves[raid['move_2']]['name']) : 'gen/unknown'
 
-      $.each(types, function (index, type) {
-        typesDisplay += getTypeSpan(type)
-      })
       str += `
-          <br>
           <div>
-            <b>${raid['pokemon_name']}</b>
-            <span> - </span>
-            <small>
-              <a href='http://www.pokemon.com/us/pokedex/${raid['pokemon_id']}' target='_blank' title='View in Pokedex'>#${raid['pokemon_id']}</a>
-            </small>
-            <span> - </span>
-            <small>${typesDisplay}</small>
-          </div>
-          <div>
-            CP: ${raid['cp']}
-          </div>
-          <div>
-            Attacken: ${pMove1} / ${pMove2}
+            <b>${raid['pokemon_name']}</b> (${pMove1} / ${pMove2})
           </div>`
     }
-    str += '<br>'
   }
 
   str += `
