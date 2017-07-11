@@ -766,6 +766,7 @@ class Gym(BaseModel):
         for g in results:
             g['name'] = None
             g['pokemon'] = []
+            g['raid'] = None
             gyms[g['gym_id']] = g
             gym_ids.append(g['gym_id'])
 
@@ -800,6 +801,17 @@ class Gym(BaseModel):
 
             for d in details:
                 gyms[d['gym_id']]['name'] = d['name']
+
+            raids = (Raid
+                     .select()
+                     .where(Raid.gym_id << gym_ids)
+                     .dicts())
+
+            for r in raids:
+                if r['pokemon_id']:
+                    r['pokemon_name'] = get_pokemon_name(r['pokemon_id'])
+                    r['pokemon_types'] = get_pokemon_types(r['pokemon_id'])
+                gyms[r['gym_id']]['raid'] = r
 
         # Re-enable the GC.
         gc.enable()
@@ -868,7 +880,29 @@ class Gym(BaseModel):
 
             result['pokemon'].append(p)
 
+        try:
+            raid = Raid.select(Raid).where(Raid.gym_id == id).dicts().get()
+            if raid['pokemon_id']:
+                raid['pokemon_name'] = get_pokemon_name(raid['pokemon_id'])
+                raid['pokemon_types'] = get_pokemon_types(raid['pokemon_id'])
+            result['raid'] = raid
+        except Raid.DoesNotExist:
+            pass
+
         return result
+
+
+class Raid(BaseModel):
+        gym_id = Utf8mb4CharField(primary_key=True, max_length=50)
+        level = IntegerField(index=True)
+        spawn = DateTimeField(index=True)
+        start = DateTimeField(index=True)
+        end = DateTimeField(index=True)
+        pokemon_id = SmallIntegerField(null=True)
+        cp = IntegerField(null=True)
+        move_1 = SmallIntegerField(null=True)
+        move_2 = SmallIntegerField(null=True)
+        last_scanned = DateTimeField(default=datetime.utcnow, index=True)
 
 
 class ScannedLocation(BaseModel):
@@ -2089,14 +2123,14 @@ def bulk_upsert(cls, data, db):
 
 def create_tables(db):
     db.connect()
-    db.create_tables([Pokemon, PokemonCurrent, Pokestop, Gym, ScannedLocation, GymDetails, GymMember, GymPokemon,
+    db.create_tables([Pokemon, PokemonCurrent, Pokestop, Gym, Raid, ScannedLocation, GymDetails, GymMember, GymPokemon,
                       Trainer, SpawnPoint, ScanSpawnPoint, SpawnpointDetectionData], safe=True)
     db.close()
 
 
 def drop_tables(db):
     db.connect()
-    db.drop_tables([Pokemon, PokemonCurrent, Pokestop, Gym, ScannedLocation, Versions, GymDetails, GymMember, GymPokemon,
+    db.drop_tables([Pokemon, PokemonCurrent, Pokestop, Gym, Raid, ScannedLocation, Versions, GymDetails, GymMember, GymPokemon,
                     Trainer, SpawnPoint, ScanSpawnPoint, SpawnpointDetectionData, Versions], safe=True)
     db.close()
 
