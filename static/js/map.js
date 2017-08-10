@@ -11,6 +11,8 @@ var $selectStyle
 var $selectIconResolution
 var $selectIconSize
 var $switchOpenGymsOnly
+var $switchRaidMinLevel
+var $switchRaidMaxLevel
 var $selectTeamGymsOnly
 var $selectLastUpdateGymsOnly
 var $selectMinGymLevel
@@ -296,6 +298,10 @@ function initSidebar () {
   $('#gym-sidebar-wrapper').toggle(Store.get('showGyms'))
   $('#gyms-filter-wrapper').toggle(Store.get('showGyms'))
   $('#team-gyms-only-switch').val(Store.get('showTeamGymsOnly'))
+  $('#raids-switch').prop('checked', Store.get('showRaids'))
+  $('#raid-min-level-only-switch').val(Store.get('showRaidMinLevel'))
+  $('#raid-max-level-only-switch').val(Store.get('showRaidMaxLevel'))
+  $('#raids-filter-wrapper').toggle(Store.get('showRaids'))
   $('#open-gyms-only-switch').prop('checked', Store.get('showOpenGymsOnly'))
   $('#min-level-gyms-filter-switch').val(Store.get('minGymLevel'))
   $('#max-level-gyms-filter-switch').val(Store.get('maxGymLevel'))
@@ -396,6 +402,18 @@ function pokemonLabel (name, rarity, types, disappearTime, id, latitude, longitu
       <a href='javascript:void(0);' onclick='javascript:openMapDirections(${latitude},${longitude});' title='Auf Karte anzeigen'>Navigation</a>
     </div>`
   return contentstring
+}
+
+function isValidRaid(raid) {
+  return raid && Date.now() < raid.end && Date.now() > raid.spawn
+}
+
+function isGymSatisfiesRaidMinMaxFilter(raid) {
+  if (raid === null) {
+    return 0
+  } else {
+    return (raid['level'] <= Store.get('showRaidMaxLevel') && raid['level'] >= Store.get('showRaidMinLevel')) ? 1 : 0
+  }
 }
 
 function gymLabel (teamName, teamId, gymPoints, latitude, longitude, lastScanned = null, lastModified = null, name = null, members = [], gymId, level, raid) {
@@ -606,6 +624,14 @@ function getIv(atk, def, stm) {
 
 function getGymLevel(gym) {
   return 6 - gym['slots_available']
+}
+
+function getRaidLevel(raid) {
+  if (raid === null) {
+    return 0
+  } else {
+    return raid['level']
+  }
 }
 
 function lpad(str, len, padstr) {
@@ -1153,7 +1179,7 @@ function showInBoundsMarkers (markers, type) {
 
 function loadRawData () {
   var loadPokemon = Store.get('showPokemon')
-  var loadGyms = Store.get('showGyms')
+  var loadGyms = (Store.get('showGyms') || Store.get('showRaids'))
   var loadPokestops = Store.get('showPokestops')
   var loadScanned = Store.get('showScanned')
   var loadSpawnpoints = Store.get('showSpawnpoints')
@@ -1340,7 +1366,9 @@ function updatePokestops () {
 
 function processGyms(i, item) {
     var gymLevel = getGymLevel(item)
-    if (!Store.get('showGyms')) {
+    var raidLevel = getRaidLevel(item.raid)
+
+    if (!Store.get('showGyms') && !Store.get('showRaids')) {
         return false // in case the checkbox was unchecked in the meantime.
     }
 
@@ -1359,6 +1387,18 @@ function processGyms(i, item) {
             removeGymFromMap(item['gym_id'])
             return true
         }
+    }
+
+    if (!Store.get('showGyms')) {
+      if (Store.get('showRaids') && !isValidRaid(item.raid)) {
+        removeGymFromMap(item['gym_id'])
+        return true
+      }
+
+      if (raidLevel > Store.get('showRaidMaxLevel') || raidLevel < Store.get('showRaidMinLevel')) {
+        removeGymFromMap(item['gym_id'])
+        return true
+      }
     }
 
     if (Store.get('showTeamGymsOnly') && Store.get('showTeamGymsOnly') !== item.team_id) {
@@ -2054,6 +2094,32 @@ $(function () {
     updateMap()
   })
 
+  $switchRaidMinLevel = $('#raid-min-level-only-switch')
+
+  $switchRaidMinLevel.select2({
+    placeholder: 'Minimum raid level',
+    minimumResultsForSearch: Infinity
+  })
+
+  $switchRaidMinLevel.on('change', function () {
+    Store.set('showRaidMinLevel', this.value)
+    lastgyms = false
+    updateMap()
+  })
+
+  $switchRaidMaxLevel = $('#raid-max-level-only-switch')
+
+  $switchRaidMaxLevel.select2({
+    placeholder: 'Maximum raid level',
+    minimumResultsForSearch: Infinity
+  })
+
+  $switchRaidMaxLevel.on('change', function () {
+    Store.set('showRaidMaxLevel', this.value)
+    lastgyms = false
+    updateMap()
+  })
+
   $selectTeamGymsOnly = $('#team-gyms-only-switch')
 
   $selectTeamGymsOnly.select2({
@@ -2364,8 +2430,6 @@ $(function () {
         // Without this there could've been a situation where no markers are on map and only newly modified ones are loaded
         if (storageKey === 'showPokemon') {
           lastpokemon = false
-        } else if (storageKey === 'showGyms') {
-          lastgyms = false
         } else if (storageKey === 'showPokestops') {
           lastpokestops = false
         } else if (storageKey === 'showScanned') {
@@ -2374,6 +2438,23 @@ $(function () {
           lastspawns = false
         }
         updateMap()
+      } else if (storageKey === 'showGyms' || storageKey === 'showRaids') {                // if any of switch is enable then do not remove gyms markers, only update them
+        if (Store.get('showGyms') || Store.get('showRaids')) {
+          lastgyms = false
+          updateMap()
+        } else {
+          $.each(dataType, function (d, dType) {
+            $.each(data[dType], function (key, value) {
+              // for any marker you're turning off, you'll want to wipe off the range
+              if (data[dType][key].marker.rangeCircle) {
+                data[dType][key].marker.rangeCircle.setMap(null)
+                delete data[dType][key].marker.rangeCircle
+              }
+              data[dType][key].marker.setMap(null)
+            })
+            data[dType] = {}
+          })
+        }
       } else {
         $.each(dataType, function (d, dType) {
           $.each(data[dType], function (key, value) {
@@ -2441,6 +2522,21 @@ $(function () {
       wrapper2.hide(options)
     }
     buildSwitchChangeListener(mapData, ['gyms'], 'showGyms').bind(this)()
+  })
+
+  $('#raids-switch').change(function () {
+    var options = {
+      'duration': 500
+    }
+    var wrapper = $('#raids-filter-wrapper')
+    if (this.checked) {
+      lastgyms = false
+      wrapper.show(options)
+    } else {
+      lastgyms = false
+      wrapper.hide(options)
+    }
+    buildSwitchChangeListener(mapData, ['gyms'], 'showRaids').bind(this)()
   })
 
   $('#scanned-switch').change(function () {
