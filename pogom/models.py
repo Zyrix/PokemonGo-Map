@@ -304,9 +304,12 @@ class Pokemon(BaseModel):
     individual_stamina = IntegerField(null=True)
     move_1 = IntegerField(null=True)
     move_2 = IntegerField(null=True)
+    cp = SmallIntegerField(null=True)
+    cp_multiplier = FloatField(null=True)
     weight = DoubleField(null=True)
     height = DoubleField(null=True)
     gender = IntegerField(null=True)
+    form = SmallIntegerField(null=True)
     last_modified = DateTimeField(null=True, index=True, default=datetime.utcnow)
 
     class Meta:

@@ -365,14 +365,36 @@ function getTimeStr(t) {
   return dateStr
 }
 
-function pokemonLabel (name, rarity, types, disappearTime, id, latitude, longitude, encounterId, atk, def, sta, move1, move2, weight, height, gender) {
+function pokemonLabel(item) {
+  var name = item['pokemon_name']
+  var types = item['pokemon_types']
+  var encounterId = item['encounter_id']
+  var id = item['pokemon_id']
+  var latitude = item['latitude']
+  var longitude = item['longitude']
+  var disappearTime = item['disappear_time']
+  var atk = item['individual_attack']
+  var def = item['individual_defense']
+  var sta = item['individual_stamina']
+  var move1 = item['move1']
+  var move2 = item['move2']
+  var weight = item['weight']
+  var height = item['height']
+  var gender = item['gender']
+  var form = item['form']
+  var cp = item['cp']
+  var cpMultiplier = item['cp_multiplier']
   var disappearDate = new Date(disappearTime)
   var details = ''
   if (atk != null) {
     var iv = (atk + def + sta) / 45 * 100
+    var pokemonLevel = getPokemonLevel(cpMultiplier)
     details = `
       <div>
         ${iv.toFixed(1)}% (${atk}/${def}/${sta})
+      </div>
+      <div>
+        ${cp} WP (Level ${pokemonLevel})
       </div>
       <div>
         ${i8ln(moves[move1]['name'])} / ${i8ln(moves[move2]['name'])}
@@ -382,10 +404,17 @@ function pokemonLabel (name, rarity, types, disappearTime, id, latitude, longitu
   if (gender != null) {
     name += ' ' + GenderType[gender - 1]
   }
+
+  var formString = ''
+  if (id === 201 && form !== null && form > 0) {
+    formString += `(${unownForm[item['form']]})`
+    formString += ' '
+  }
+
   var contentstring = `
     <div>
-      <b>${name}</b>
-      <span> - </span>
+      <b>${name} ${formString}</b>
+      <span>- </span>
       <span class='label-countdown-old' disappears-at='${disappearTime}'>00m00s </span>
       <span>(${pad(disappearDate.getHours())}:${pad(disappearDate.getMinutes())}:${pad(disappearDate.getSeconds())})</span>
     </div>
@@ -622,6 +651,18 @@ function getIv(atk, def, stm) {
     return false
 }
 
+function getPokemonLevel(cpMultiplier) {
+    if (cpMultiplier < 0.734) {
+        var pokemonLevel = (58.35178527 * cpMultiplier * cpMultiplier -
+        2.838007664 * cpMultiplier + 0.8539209906)
+    } else {
+        pokemonLevel = 171.0112688 * cpMultiplier - 95.20425243
+    }
+    pokemonLevel = (Math.round(pokemonLevel) * 2) / 2
+
+    return pokemonLevel
+}
+
 function getGymLevel(gym) {
   return 6 - gym['slots_available']
 }
@@ -718,7 +759,7 @@ function updatePokemonMarker (marker, item) {
 
   marker.setIcon(icon)
   marker.set('labelAnchor', new google.maps.Point(13, -iconSize / 2.4))
-  marker.infoWindow.setContent(pokemonLabel(item['pokemon_name'], item['pokemon_rarity'], item['pokemon_types'], item['disappear_time'], item['pokemon_id'], item['latitude'], item['longitude'], item['encounter_id'], item['individual_attack'], item['individual_defense'], item['individual_stamina'], item['move_1'], item['move_2'], item['weight'], item['height'], item['gender']))
+  marker.infoWindow.setContent(pokemonLabel(item))
 
   if (item['individual_attack'] != null) {
     var perfection = getIv(item['individual_attack'], item['individual_defense'], item['individual_stamina'])
@@ -761,7 +802,7 @@ function customizePokemonMarker (marker, item, skipNotification) {
   }
 
   marker.infoWindow = new google.maps.InfoWindow({
-    content: pokemonLabel(item['pokemon_name'], item['pokemon_rarity'], item['pokemon_types'], item['disappear_time'], item['pokemon_id'], item['latitude'], item['longitude'], item['encounter_id'], item['individual_attack'], item['individual_defense'], item['individual_stamina'], item['move_1'], item['move_2'], item['weight'], item['height'], item['gender']),
+    content: pokemonLabel(item),
     disableAutoPan: true
   })
 
