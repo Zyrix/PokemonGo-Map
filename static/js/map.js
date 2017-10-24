@@ -292,7 +292,6 @@ function initSidebar () {
   $('#pokemon-switch').prop('checked', Store.get('showPokemon'))
   $('#pokemon-filter-wrapper').toggle(Store.get('showPokemon'))
   $('#show-medal-magikarp-switch').prop('checked', Store.get('showMedalMagikarp'))
-  $('#show-medal-rattata-switch').prop('checked', Store.get('showMedalRattata'))
   $('#gyms-switch').prop('checked', Store.get('showGyms'))
   $('#gym-sidebar-switch').prop('checked', Store.get('useGymSidebar'))
   $('#gym-sidebar-wrapper').toggle(Store.get('showGyms'))
@@ -323,7 +322,6 @@ function initSidebar () {
   $('#ranges-switch').prop('checked', Store.get('showRanges'))
   $('#sound-switch').prop('checked', Store.get('playSound'))
   $('#notify-medal-magikarp-switch').prop('checked', Store.get('notifyMedalMagikarp'))
-  $('#notify-medal-rattata-switch').prop('checked', Store.get('notifyMedalRattata'))
   $('#next-location').css('background-color', $('#geoloc-switch').prop('checked') ? '#e0e0e0' : '#ffffff')
 
   var icons = $('#pokemon-icons')
@@ -774,7 +772,7 @@ function updatePokemonMarker (marker, item) {
     }
   }
 
-  if (((Store.get('notifyMedalMagikarp') && item['pokemon_id'] === 129) || (Store.get('notifyMedalRattata') && item['pokemon_id'] === 19)) && isMedalPokemon(item)) {
+  if (Store.get('notifyMedalMagikarp') && item['pokemon_id'] === 129 && isMedalPokemon(item)) {
     if (Store.get('playSound')) {
       audio.play()
     }
@@ -834,7 +832,7 @@ function customizePokemonMarker (marker, item, skipNotification) {
     }
   }
 
-  if (((Store.get('notifyMedalMagikarp') && item['pokemon_id'] === 129) || (Store.get('notifyMedalRattata') && item['pokemon_id'] === 19)) && isMedalPokemon(item)) {
+  if (Store.get('notifyMedalMagikarp') && item['pokemon_id'] === 129 && isMedalPokemon(item)) {
     if (!skipNotification) {
       if (Store.get('playSound')) {
         audio.play()
@@ -1130,7 +1128,7 @@ function addListeners (marker) {
 
 function isPokemonVisible(item) {
   var perfection = 100.0 * (item['individual_defense'] + item['individual_attack'] + item['individual_stamina']) / 45
-  var showMedal = isMedalPokemon(item) && ((Store.get('showMedalMagikarp') && item['pokemon_id'] === 129) || (Store.get('showMedalRattata') && item['pokemon_id'] === 19))
+  var showMedal = isMedalPokemon(item) && Store.get('showMedalMagikarp') && item['pokemon_id'] === 129
   if (item['disappear_time'] < new Date().getTime() ||
     ((excludedPokemon.indexOf(item['pokemon_id']) >= 0) && ((isNaN(perfection)) || (perfection < perfectionLimit)) && !showMedal) ||
     ((excludedPerfectionPokemon.indexOf(item['pokemon_id']) >= 0) && (perfection >= perfectionLimit) && !showMedal)) {
@@ -1235,13 +1233,6 @@ function loadRawData () {
   var neLng = nePoint.lng()
 
   var excludedPokemonRequest = excludedPokemon.slice()
-
-  if (Store.get('showMedalRattata')) {
-    var index = excludedPokemonRequest.indexOf(19)
-    if (index > -1) {
-      excludedPokemonRequest.splice(index, 1);
-    }
-  }
 
   if (Store.get('showMedalMagikarp')) {
     var index = excludedPokemonRequest.indexOf(129)
@@ -2530,12 +2521,6 @@ $(function () {
     buildSwitchChangeListener(mapData, ['pokemons'], 'showPokemon').bind(this)()
   })
 
-  $('#show-medal-rattata-switch').change(function () {
-    Store.set('showMedalRattata', this.checked)
-    reincludedPokemon = reincludedPokemon.concat(19)
-    updateMap()
-  })
-
   $('#show-medal-magikarp-switch').change(function () {
     Store.set('showMedalMagikarp', this.checked)
     reincludedPokemon = reincludedPokemon.concat(129)
@@ -2607,11 +2592,6 @@ $(function () {
 
   $('#sound-switch').change(function () {
     Store.set('playSound', this.checked)
-  })
-
-  $('#notify-medal-rattata-switch').change(function () {
-    Store.set('notifyMedalRattata', this.checked)
-    updateMap()
   })
 
   $('#notify-medal-magikarp-switch').change(function () {

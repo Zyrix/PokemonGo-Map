@@ -907,10 +907,6 @@ var StoreOptions = {
     default: true,
     type: StoreTypes.Boolean
   },
-  'showMedalRattata': {
-    default: false,
-    type: StoreTypes.Boolean
-  },
   'showRaids': {
     default: false,
     type: StoreTypes.Boolean
@@ -1040,10 +1036,6 @@ var StoreOptions = {
     type: StoreTypes.Number
   },
   'notifyMedalMagikarp': {
-    default: true,
-    type: StoreTypes.Boolean
-  },
-  'notifyMedalRattata': {
     default: true,
     type: StoreTypes.Boolean
   }
