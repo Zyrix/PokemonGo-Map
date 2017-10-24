@@ -381,6 +381,88 @@ class Pokemon(BaseModel):
 
         return pokemons
 
+
+    @staticmethod
+    def get_active_by_eid(eids, perfLimit, swLat, swLng, neLat, neLng, timestamp=0, oSwLat=None, oSwLng=None, oNeLat=None, oNeLng=None):
+        now_date = datetime.utcnow()
+        # now_secs = date_secs(now_date)
+        query = Pokemon.select()
+
+        if not (swLat and swLng and neLat and neLng):
+            query = (query
+                     .where(Pokemon.disappear_time > now_date &
+                            (~(Pokemon.pokemon_id << eids) |
+                             ((Pokemon.individual_attack +
+                              Pokemon.individual_defense +
+                              Pokemon.individual_stamina) / 45.0 * 100 >= perfLimit)))
+                     .dicts())
+        elif timestamp > 0:
+            # If timestamp is known only load modified pokemon.
+            query = (query
+                     .where(((Pokemon.last_modified > datetime.utcfromtimestamp(timestamp / 1000)) &
+                             (Pokemon.disappear_time > now_date)) &
+                            ((Pokemon.latitude >= swLat) &
+                             (Pokemon.longitude >= swLng) &
+                             (Pokemon.latitude <= neLat) &
+                             (Pokemon.longitude <= neLng)) &
+                            (~(Pokemon.pokemon_id << eids) |
+                             ((Pokemon.individual_attack +
+                              Pokemon.individual_defense +
+                              Pokemon.individual_stamina) / 45.0 * 100 >= perfLimit)))
+                     .dicts())
+        elif oSwLat and oSwLng and oNeLat and oNeLng:
+            # Send Pokemon in view but exclude those within old boundaries. Only send newly uncovered Pokemon.
+            query = (query
+                     .where((Pokemon.disappear_time > now_date) &
+                            ((Pokemon.latitude >= swLat) &
+                             (Pokemon.longitude >= swLng) &
+                             (Pokemon.latitude <= neLat) &
+                             (Pokemon.longitude <= neLng)) &
+                            ~((Pokemon.disappear_time > now_date) &
+                              (Pokemon.latitude >= oSwLat) &
+                              (Pokemon.longitude >= oSwLng) &
+                              (Pokemon.latitude <= oNeLat) &
+                              (Pokemon.longitude <= oNeLng)) &
+                            (~(Pokemon.pokemon_id << eids) |
+                             ((Pokemon.individual_attack +
+                              Pokemon.individual_defense +
+                              Pokemon.individual_stamina) / 45.0 * 100 >= perfLimit)))
+                     .dicts())
+        else:
+            query = (Pokemon
+                     .select()
+                     # add 1 hour buffer to include spawnpoints that persist after tth, like shsh
+                     .where((Pokemon.disappear_time > now_date) &
+                            ((Pokemon.latitude >= swLat) &
+                             (Pokemon.longitude >= swLng) &
+                             (Pokemon.latitude <= neLat) &
+                             (Pokemon.longitude <= neLng)) &
+                            (~(Pokemon.pokemon_id << eids) |
+                             ((Pokemon.individual_attack +
+                              Pokemon.individual_defense +
+                              Pokemon.individual_stamina) / 45.0 * 100 >= perfLimit)))
+                     .dicts())
+
+        # Performance: Disable the garbage collector prior to creating a (potentially) large dict with append().
+        gc.disable()
+
+        pokemons = []
+        for p in list(query):
+
+            p['pokemon_name'] = get_pokemon_name(p['pokemon_id'])
+            p['pokemon_rarity'] = get_pokemon_rarity(p['pokemon_id'])
+            p['pokemon_types'] = get_pokemon_types(p['pokemon_id'])
+            if args.china:
+                p['latitude'], p['longitude'] = \
+                    transform_from_wgs_to_gcj(p['latitude'], p['longitude'])
+            pokemons.append(p)
+
+        # Re-enable the GC.
+        gc.enable()
+
+        return pokemons
+
+
     @staticmethod
     def get_active_by_id(ids, swLat, swLng, neLat, neLng):
         if not (swLat and swLng and neLat and neLng):
