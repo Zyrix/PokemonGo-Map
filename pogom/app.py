@@ -163,38 +163,43 @@ class Pogom(Flask):
         d['oNeLat'] = neLat
         d['oNeLng'] = neLng
 
+        poke = Pokemon
+        if args.type == 'speed':
+            poke = PokemonCurrent
+
+
         if request.args.get('pokemon', 'true') == 'true':
             if request.args.get('ids'):
                 ids = [int(x) for x in request.args.get('ids').split(',')]
-                d['pokemons'] = PokemonCurrent.get_active_by_id(ids, swLat, swLng,
+                d['pokemons'] = poke.get_active_by_id(ids, swLat, swLng,
                                                          neLat, neLng)
             elif lastpokemon != 'true':
                 # If this is first request since switch on, load all pokemon on screen.
                 if request.args.get('eids'):
                     eids = [int(x) for x in request.args.get('eids').split(',')]
-                    d['pokemons'] = PokemonCurrent.get_active_by_eid(eids, perfectionLimit, swLat, swLng, neLat, neLng)
+                    d['pokemons'] = poke.get_active_by_eid(eids, perfectionLimit, swLat, swLng, neLat, neLng)
                 else:
-                    d['pokemons'] = PokemonCurrent.get_active(swLat, swLng, neLat, neLng)
+                    d['pokemons'] = poke.get_active(swLat, swLng, neLat, neLng)
             else:
                 # If map is already populated only request modified Pokemon since last request time.
                 if request.args.get('eids'):
                     eids = [int(x) for x in request.args.get('eids').split(',')]
-                    d['pokemons'] = PokemonCurrent.get_active_by_eid(eids, perfectionLimit, swLat, swLng, neLat, neLng, timestamp=timestamp)
+                    d['pokemons'] = poke.get_active_by_eid(eids, perfectionLimit, swLat, swLng, neLat, neLng, timestamp=timestamp)
                 else:
-                    d['pokemons'] = PokemonCurrent.get_active(swLat, swLng, neLat, neLng, timestamp=timestamp)
+                    d['pokemons'] = poke.get_active(swLat, swLng, neLat, neLng, timestamp=timestamp)
                 if newArea:
                     # If screen is moved add newly uncovered Pokemon to the ones that were modified since last request time.
                     if request.args.get('eids'):
                         eids = [int(x) for x in request.args.get('eids').split(',')]
-                        d['pokemons'] = d['pokemons'] + (PokemonCurrent.get_active_by_eid(eids, perfectionLimit, swLat, swLng, neLat, neLng, oSwLat=oSwLat, oSwLng=oSwLng, oNeLat=oNeLat, oNeLng=oNeLng))
+                        d['pokemons'] = d['pokemons'] + (poke.get_active_by_eid(eids, perfectionLimit, swLat, swLng, neLat, neLng, oSwLat=oSwLat, oSwLng=oSwLng, oNeLat=oNeLat, oNeLng=oNeLng))
                     else:
-                        d['pokemons'] = d['pokemons'] + (PokemonCurrent.get_active(swLat, swLng, neLat, neLng, oSwLat=oSwLat, oSwLng=oSwLng, oNeLat=oNeLat, oNeLng=oNeLng))
+                        d['pokemons'] = d['pokemons'] + (poke.get_active(swLat, swLng, neLat, neLng, oSwLat=oSwLat, oSwLng=oSwLng, oNeLat=oNeLat, oNeLng=oNeLng))
 
             if request.args.get('reids'):
                 used = set()
                 reids = [int(x) for x in request.args.get('reids').split(',')]
                 reids = [x for x in reids if x not in used and (used.add(x) or True)]
-                d['pokemons'] = d['pokemons'] + (PokemonCurrent.get_active_by_id(reids, swLat, swLng, neLat, neLng))
+                d['pokemons'] = d['pokemons'] + (poke.get_active_by_id(reids, swLat, swLng, neLat, neLng))
                 d['reids'] = reids
 
         if request.args.get('pokestops', 'true') == 'true':
@@ -289,7 +294,7 @@ class Pogom(Flask):
         lon = request.args.get('lon', self.current_location[1], type=float)
         origin_point = LatLng.from_degrees(lat, lon)
 
-        for pokemon in PokemonCurrent.get_active(None, None, None, None):
+        for pokemon in poke.get_active(None, None, None, None):
             pokemon_point = LatLng.from_degrees(pokemon['latitude'],
                                                 pokemon['longitude'])
             diff = pokemon_point - origin_point
