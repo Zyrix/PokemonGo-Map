@@ -167,7 +167,6 @@ class Pogom(Flask):
         if args.type == 'speed':
             poke = PokemonCurrent
 
-
         if request.args.get('pokemon', 'true') == 'true':
             if request.args.get('ids'):
                 ids = [int(x) for x in request.args.get('ids').split(',')]
