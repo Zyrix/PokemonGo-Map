@@ -285,6 +285,9 @@ class PokemonCurrent(BaseModel):
             if args.china:
                 p['latitude'], p['longitude'] = \
                     transform_from_wgs_to_gcj(p['latitude'], p['longitude'])
+            if args.version != 'full':
+                p['cp'] = None
+                p['cp_multiplier'] = None
             pokemons.append(p)
 
         # Re-enable the GC.
