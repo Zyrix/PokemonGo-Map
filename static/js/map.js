@@ -391,13 +391,19 @@ function pokemonLabel(item) {
       <div>
         ${iv.toFixed(1)}% (${atk}/${def}/${sta})
       </div>
-      <div>
-        ${cp} WP (Level ${pokemonLevel})
-      </div>
-      <div>
-        ${i8ln(moves[move1]['name'])} / ${i8ln(moves[move2]['name'])}
-      </div>
       `
+    if (cp != null) {
+       details += `
+       <div>
+         ${cp} WP (Level ${pokemonLevel})
+       </div>
+       `
+    }
+    details += `
+    <div>
+      ${i8ln(moves[move1]['name'])} / ${i8ln(moves[move2]['name'])}
+    </div>
+    `
   }
   if (gender != null) {
     name += ' ' + GenderType[gender - 1]
