@@ -25,3 +25,4 @@ beehive.*
 !contrib/supervisord/gen-workers.sh
 !contrib/supervisord/install-reinstall.sh
 !static/data/*
+.DS_Store
