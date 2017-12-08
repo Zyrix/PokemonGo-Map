@@ -99,6 +99,10 @@ var notifyNoMoveText = '<udist> (<dist>)'
 // Functions
 //
 
+function excludeAllPokemon () {
+
+}
+
 function excludePokemon (id) { // eslint-disable-line no-unused-vars
   $selectExclude.val(
     $selectExclude.val().concat(id)
@@ -374,8 +378,8 @@ function pokemonLabel(item) {
   var atk = item['individual_attack']
   var def = item['individual_defense']
   var sta = item['individual_stamina']
-  var move1 = item['move_1']
-  var move2 = item['move_2']
+  var pMove1 = (moves[item['move_1']] !== undefined) ? i8ln(moves[item['move_1']]['name']) : 'gen/unknown'
+  var pMove2 = (moves[item['move_2']] !== undefined) ? i8ln(moves[item['move_2']]['name']) : 'gen/unknown'
   var weight = item['weight']
   var height = item['height']
   var gender = item['gender']
@@ -401,7 +405,7 @@ function pokemonLabel(item) {
     }
     details += `
     <div>
-      ${i8ln(moves[move1]['name'])} / ${i8ln(moves[move2]['name'])}
+      ${pMove1} / ${pMove2}
     </div>
     `
   }
@@ -712,8 +716,8 @@ function getTimeUntil(time) {
 function getNotifyText(item) {
     var iv = getIv(item['individual_attack'], item['individual_defense'], item['individual_stamina'])
     if (moves[item['move_1']]) {
-        var move_1 = i8ln(moves[item['move_1']]['name'])
-        var move_2 = i8ln(moves[item['move_2']]['name'])
+        var move_1 = (moves[item['move_1']] !== undefined) ? i8ln(moves[item['move_1']]['name']) : 'gen/unknown'
+        var move_2 = (moves[item['move_2']] !== undefined) ? i8ln(moves[item['move_2']]['name']) : 'gen/unknown'
     }
     var find = ['<prc>', '<pkm>', '<atk>', '<def>', '<sta>']
     var replace = [((iv) ? iv.toFixed(1) : ''), item['pokemon_name'], item['individual_attack'],
