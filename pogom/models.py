@@ -171,13 +171,13 @@ class PokemonCurrent(BaseModel):
             if args.version != 'full':
                 p['cp'] = None
                 p['cp_multiplier'] = None
-                p['individual_attack'] = IntegerField(null=True)
-                p['individual_defense'] = IntegerField(null=True)
-                p['individual_stamina'] = IntegerField(null=True)
-                p['move_1'] = IntegerField(null=True)
-                p['move_2'] = IntegerField(null=True)
-                p['weight'] = IntegerField(null=True)
-                p['height'] = IntegerField(null=True)
+                p['individual_attack'] = None
+                p['individual_defense'] = None
+                p['individual_stamina'] = None
+                p['move_1'] = None
+                p['move_2'] = None
+                p['weight'] = None
+                p['height'] = None
             pokemons.append(p)
 
         # Re-enable the GC.
@@ -261,6 +261,13 @@ class PokemonCurrent(BaseModel):
             if args.version != 'full':
                 p['cp'] = None
                 p['cp_multiplier'] = None
+                p['individual_attack'] = None
+                p['individual_defense'] = None
+                p['individual_stamina'] = None
+                p['move_1'] = None
+                p['move_2'] = None
+                p['weight'] = None
+                p['height'] = None
             pokemons.append(p)
 
         # Re-enable the GC.
@@ -301,6 +308,13 @@ class PokemonCurrent(BaseModel):
             if args.version != 'full':
                 p['cp'] = None
                 p['cp_multiplier'] = None
+                p['individual_attack'] = None
+                p['individual_defense'] = None
+                p['individual_stamina'] = None
+                p['move_1'] = None
+                p['move_2'] = None
+                p['weight'] = None
+                p['height'] = None
             pokemons.append(p)
 
         # Re-enable the GC.
@@ -484,6 +498,13 @@ class Pokemon(BaseModel):
             if args.version != 'full':
                 p['cp'] = None
                 p['cp_multiplier'] = None
+                p['individual_attack'] = None
+                p['individual_defense'] = None
+                p['individual_stamina'] = None
+                p['move_1'] = None
+                p['move_2'] = None
+                p['weight'] = None
+                p['height'] = None
             pokemons.append(p)
 
         # Re-enable the GC.
@@ -525,6 +546,13 @@ class Pokemon(BaseModel):
             if args.version != 'full':
                 p['cp'] = None
                 p['cp_multiplier'] = None
+                p['individual_attack'] = None
+                p['individual_defense'] = None
+                p['individual_stamina'] = None
+                p['move_1'] = None
+                p['move_2'] = None
+                p['weight'] = None
+                p['height'] = None
             pokemons.append(p)
 
         # Re-enable the GC.
@@ -805,6 +833,13 @@ class Pokestop(BaseModel):
             if args.version != 'full':
                 p['cp'] = None
                 p['cp_multiplier'] = None
+                p['individual_attack'] = None
+                p['individual_defense'] = None
+                p['individual_stamina'] = None
+                p['move_1'] = None
+                p['move_2'] = None
+                p['weight'] = None
+                p['height'] = None
             pokestops.append(p)
 
         # Re-enable the GC.
