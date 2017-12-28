@@ -171,6 +171,13 @@ class PokemonCurrent(BaseModel):
             if args.version != 'full':
                 p['cp'] = None
                 p['cp_multiplier'] = None
+                p['individual_attack'] = IntegerField(null=True)
+                p['individual_defense'] = IntegerField(null=True)
+                p['individual_stamina'] = IntegerField(null=True)
+                p['move_1'] = IntegerField(null=True)
+                p['move_2'] = IntegerField(null=True)
+                p['weight'] = IntegerField(null=True)
+                p['height'] = IntegerField(null=True)
             pokemons.append(p)
 
         # Re-enable the GC.
