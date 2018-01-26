@@ -1130,7 +1130,7 @@ function setupPokemonMarker (item, map, perfectionLimit, isBounceDisabled) {
 
   // Display big Magikarps different
   if (item['pokemon_id'] == 129 && isMedalPokemon(item)) {
-    pokemonIndex = 251
+    pokemonIndex = 384
   }
 
   var sprite = pokemonSprites['gen2']
