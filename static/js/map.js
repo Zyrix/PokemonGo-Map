@@ -758,9 +758,9 @@ function updatePokemonMarker (marker, item) {
   var pokemonIndex = item['pokemon_id'] - 1
 
   // Display big Magikarps different
-  //if (item['pokemon_id'] == 129 && isMedalPokemon(item)) {
-    //pokemonIndex = 129
-  //}
+  if (item['pokemon_id'] == 129 && isMedalPokemon(item)) {
+    pokemonIndex = 385
+  }
 
   var sprite = pokemonSprites['gen2']
   var icon = getGoogleSprite(pokemonIndex, sprite, iconSize)
