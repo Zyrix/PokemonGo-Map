@@ -9,7 +9,7 @@
   transform: scale(0.53) translateX(-3px) translateY(-3px);
   transform-origin: left top;
 
-  @for $i from 1 through 251 {
+  @for $i from 1 through 386 {
     &.n#{$i} {
       background-position: -#{(($i - 1) % 25) * 80}px -#{floor(($i - 1) / 25) * 80}px
     }
@@ -28,7 +28,7 @@
   margin-bottom: -40px;
   margin-left: -40px;
 
-  @for $i from 1 through 251 {
+  @for $i from 1 through 386 {
     &.n#{$i} {
       background-position: -#{(($i - 1) % 25) * 80}px -#{floor(($i - 1) / 25) * 80}px;
       height: 80px;
